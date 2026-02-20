@@ -1,8 +1,32 @@
 import { z } from 'zod';
 
+const portSchema = z.coerce.number().int().min(1).max(65535);
+const requiredStringSchema = z.string().trim().min(1);
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('production'),
-  APP_PORT: z.coerce.number().default(3000),
+  APP_URL: z.url().default('http://localhost:3000'),
+  APP_PORT: portSchema.default(3000),
+  STORAGE_URL: z.url(),
+
+  REDIS_PASSWORD: requiredStringSchema,
+
+  DB_HOST: requiredStringSchema,
+  DB_PORT: portSchema,
+  DB_USER: requiredStringSchema,
+  DB_PASSWORD: requiredStringSchema,
+  DB_NAME: requiredStringSchema,
+
+  MAIL_SECURE: z.enum(['0', '1']).transform((v) => v === '1'),
+  MAIL_HOST: requiredStringSchema,
+  MAIL_PORT: portSchema,
+  MAIL_USER: requiredStringSchema,
+  MAIL_PASSWORD: requiredStringSchema,
+
+  MINIO_HOST: requiredStringSchema,
+  MINIO_BUCKET: requiredStringSchema,
+  MINIO_USER: requiredStringSchema,
+  MINIO_PASSWORD: requiredStringSchema,
 });
 
 type EnvConfig = z.infer<typeof envSchema>;
