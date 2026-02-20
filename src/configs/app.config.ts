@@ -13,7 +13,7 @@ const AppConfig = () => {
     redis: {
       password: env.REDIS_PASSWORD,
     },
-    databse: {
+    database: {
       host: env.DB_HOST,
       port: env.DB_PORT,
       username: env.DB_USER,
