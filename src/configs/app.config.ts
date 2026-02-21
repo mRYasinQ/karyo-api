@@ -33,6 +33,12 @@ const AppConfig = () => {
       username: env.MINIO_USER,
       password: env.MINIO_PASSWORD,
     },
+    time: {
+      otp: {
+        expire: env.OTP_EXPIRE,
+        cache: env.OTP_CACHE,
+      },
+    },
   };
 };
 

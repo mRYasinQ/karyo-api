@@ -1,4 +1,3 @@
-import { createHash, randomBytes } from 'node:crypto';
 import path from 'node:path';
 
 import { Injectable, type OnModuleInit } from '@nestjs/common';
@@ -10,6 +9,7 @@ import { Upload } from '@aws-sdk/lib-storage';
 import getStorageConfig from '@/configs/storage.config';
 
 import type { EnvConfig } from '@/shared/schemas/env.schema';
+import { generateRandomBytes, md5 } from '@/shared/utils/random';
 
 @Injectable()
 class StorageService implements OnModuleInit {
@@ -26,9 +26,7 @@ class StorageService implements OnModuleInit {
   }
 
   async uploadFile(file: Express.Multer.File, folder?: string) {
-    const hash = createHash('md5')
-      .update(randomBytes(16).toString('hex') + Date.now())
-      .digest('hex');
+    const hash = md5(generateRandomBytes(16, 'hex') + Date.now());
 
     const ext = path.extname(file.originalname).toLowerCase();
     const uniqueFileName = `${hash}${ext}`;

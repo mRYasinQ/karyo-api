@@ -24,6 +24,9 @@ declare global {
       MINIO_BUCKET: string;
       MINIO_USER: string;
       MINIO_PASSWORD: string;
+
+      OTP_EXPIRE: string;
+      OTP_CACHE: string;
     }
   }
 }
