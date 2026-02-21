@@ -11,10 +11,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = app.get(ConfigService);
+  const nodeEnv = config.getOrThrow<EnvConfig['NODE_ENV']>('node_env');
   const url = config.getOrThrow<EnvConfig['APP_URL']>('app.url');
   const port = config.getOrThrow<EnvConfig['APP_PORT']>('app.port');
 
-  setupSwagger(app, url);
+  if (nodeEnv === 'development') setupSwagger(app, url);
 
   await app.listen(port);
 }

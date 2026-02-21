@@ -8,7 +8,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tsEslint from 'typescript-eslint';
 
 const eslintConfig = defineConfig([
-  globalIgnores(['dist/**/*', 'node_modules/**/*', 'eslint.config.mjs']),
+  globalIgnores(['dist/**/*', 'node_modules/**/*', 'src/migrations/*.ts', 'eslint.config.mjs']),
   ...tsEslint.configs.recommendedTypeChecked,
   {
     languageOptions: {

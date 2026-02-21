@@ -22,8 +22,8 @@ const DbConfig: MikroOrmModuleAsyncOptions = {
     user: config.get<EnvConfig['DB_USER']>('database.username'),
     password: config.get<EnvConfig['DB_PASSWORD']>('database.password'),
 
-    entities: ['./dist/**/**/*.entity.js'],
-    entitiesTs: ['./src/**/**/*.entity.ts'],
+    entities: ['./dist/modules/**/**/*.entity.js'],
+    entitiesTs: ['./src/modules/**/**/*.entity.ts'],
   }),
 };
 
