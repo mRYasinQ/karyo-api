@@ -19,6 +19,7 @@ const envSchema = z.object({
   APP_PORT: portSchema.default(3000),
   STORAGE_URL: z.url(),
 
+  REDIS_URL: z.url(),
   REDIS_PASSWORD: requiredStringSchema,
 
   DB_HOST: requiredStringSchema,

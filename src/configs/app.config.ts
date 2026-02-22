@@ -11,6 +11,7 @@ const AppConfig = () => {
       storage_url: env.STORAGE_URL,
     },
     redis: {
+      url: env.REDIS_URL,
       password: env.REDIS_PASSWORD,
     },
     database: {
