@@ -1,0 +1,50 @@
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
+import ApiStandard from '@/shared/decorators/api-standard.decorator';
+
+import AuthMessage from './auth.message';
+import AuthService from './auth.service';
+import { RegisterDto, SendOtpDto, VerifyOtpDto } from './dtos/auth.dto';
+import { RegisterResponseDto, SendOtpResponseDto, VerifyOtpResponseDto } from './dtos/auth-response.dto';
+
+@Controller('auth')
+@ApiTags('Authentication')
+class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('register')
+  @ApiStandard({
+    status: HttpStatus.CREATED,
+    successMessage: AuthMessage.REGISTER_SUCCESS,
+    summary: 'Register user',
+    type: RegisterResponseDto,
+  })
+  register(@Body() body: RegisterDto) {
+    return this.authService.register(body);
+  }
+
+  @Post('register/send-otp')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.SENT_OTP,
+    summary: 'Send otp to email',
+    type: SendOtpResponseDto,
+  })
+  sendRegisterOtp(@Body() body: SendOtpDto) {
+    return this.authService.sendRegisterOtp(body);
+  }
+
+  @Post('register/verify-otp')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.VERIFIED_OTP,
+    summary: 'Verify otp',
+    type: VerifyOtpResponseDto,
+  })
+  verifyRegisterOtp(@Body() body: VerifyOtpDto) {
+    return this.authService.verifyRegisterOtp(body);
+  }
+}
+
+export default AuthController;

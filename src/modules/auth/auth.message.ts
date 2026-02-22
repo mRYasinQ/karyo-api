@@ -1,0 +1,11 @@
+const AuthMessage = {
+  REGISTER_SUCCESS: 'ثبت‌نام با موفقیت انجام شد.',
+  SENT_OTP: 'کد تایید ارسال شد.',
+  VERIFIED_OTP: 'کد تایید شد.',
+  OTP_ALREADY_VERIFIED: 'این کد قبلا تایید شده است.',
+  EMAIL_ALREADY_ASSOCIATED: 'حسابی با این ایمیل ثبت شده است.',
+  INVALID_OTP: 'کد تایید معتبر نمی‌باشد.',
+  WAIT_BEFORE_NEW_OTP: 'لطفا :time ثانیه دیگر دوباره تلاش کنید.',
+} as const;
+
+export default AuthMessage;
