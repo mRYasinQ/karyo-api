@@ -2,7 +2,9 @@ import { Entity, Opt, Property } from '@mikro-orm/postgresql';
 
 import BaseEntity from '@/shared/entities/base.entity';
 
-@Entity({ tableName: 'users' })
+import UserRepository from './user.repository';
+
+@Entity({ tableName: 'users', repository: () => UserRepository })
 class UserEntity extends BaseEntity {
   @Property({ length: 30, nullable: true })
   firstName: string | null = null;
