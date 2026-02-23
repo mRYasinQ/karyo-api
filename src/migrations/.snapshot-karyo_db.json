@@ -94,6 +94,16 @@
           "default": "true",
           "mappedType": "boolean"
         },
+        "is_email_verified": {
+          "name": "is_email_verified",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
+        },
         "birthday": {
           "name": "birthday",
           "type": "date",

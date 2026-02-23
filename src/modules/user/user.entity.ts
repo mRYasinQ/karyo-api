@@ -24,6 +24,9 @@ class UserEntity extends BaseEntity {
   @Property()
   isActive: boolean & Opt = true;
 
+  @Property()
+  isEmailVerified: boolean & Opt = false;
+
   @Property({ type: 'date', nullable: true })
   birthday: Date | null = null;
 }
