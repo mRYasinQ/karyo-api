@@ -18,6 +18,10 @@ const registerSchema = baseAuthSchema;
 class RegisterDto extends createZodDto(registerSchema) {}
 type Register = z.infer<typeof registerSchema>;
 
+const recoverSchema = baseAuthSchema;
+class RecoverDto extends createZodDto(recoverSchema) {}
+type Recover = z.infer<typeof recoverSchema>;
+
 const sendOtpSchema = baseAuthSchema.pick({ email: true });
 class SendOtpDto extends createZodDto(sendOtpSchema) {}
 type SendOtp = z.infer<typeof sendOtpSchema>;
@@ -26,5 +30,5 @@ const verifyOtpSchema = baseAuthSchema.omit({ password: true });
 class VerifyOtpDto extends createZodDto(verifyOtpSchema) {}
 type VerifyOtp = z.infer<typeof verifyOtpSchema>;
 
-export type { Register, SendOtp, VerifyOtp };
-export { RegisterDto, SendOtpDto, VerifyOtpDto };
+export type { Register, Recover, SendOtp, VerifyOtp };
+export { RegisterDto, RecoverDto, SendOtpDto, VerifyOtpDto };

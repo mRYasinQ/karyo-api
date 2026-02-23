@@ -16,7 +16,9 @@ class VerifyOtpData {
 }
 
 const RegisterResponseDto = createResponseDto();
+const RecoverResponseDto = createResponseDto();
+
 const SendOtpResponseDto = createResponseDto(SendOtpData);
 const VerifyOtpResponseDto = createResponseDto(VerifyOtpData);
 
-export { RegisterResponseDto, SendOtpResponseDto, VerifyOtpResponseDto };
+export { RegisterResponseDto, RecoverResponseDto, SendOtpResponseDto, VerifyOtpResponseDto };

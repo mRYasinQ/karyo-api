@@ -5,8 +5,8 @@ import ApiStandard from '@/shared/decorators/api-standard.decorator';
 
 import AuthMessage from './auth.message';
 import AuthService from './auth.service';
-import { RegisterDto, SendOtpDto, VerifyOtpDto } from './dtos/auth.dto';
-import { RegisterResponseDto, SendOtpResponseDto, VerifyOtpResponseDto } from './dtos/auth-response.dto';
+import { RecoverDto, RegisterDto, SendOtpDto, VerifyOtpDto } from './dtos/auth.dto';
+import { RecoverResponseDto, RegisterResponseDto, SendOtpResponseDto, VerifyOtpResponseDto } from './dtos/auth-response.dto';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -44,6 +44,39 @@ class AuthController {
   })
   verifyRegisterOtp(@Body() body: VerifyOtpDto) {
     return this.authService.verifyRegisterOtp(body);
+  }
+
+  @Post('recover')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.RECOVER_SUCCESS,
+    summary: 'Recover password',
+    type: RecoverResponseDto,
+  })
+  recover(@Body() body: RecoverDto) {
+    return this.authService.recover(body);
+  }
+
+  @Post('recover/send-otp')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.SENT_OTP,
+    summary: 'Send otp to email for recover password',
+    type: SendOtpResponseDto,
+  })
+  sendRecoverOtp(@Body() body: SendOtpDto) {
+    return this.authService.sendRecoverOtp(body);
+  }
+
+  @Post('recover/verify-otp')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.VERIFIED_OTP,
+    summary: 'Verify otp for recover password',
+    type: VerifyOtpResponseDto,
+  })
+  verifyRecoverOtp(@Body() body: VerifyOtpDto) {
+    return this.authService.verifyRecoverOtp(body);
   }
 }
 
