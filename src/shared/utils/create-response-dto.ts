@@ -1,19 +1,25 @@
-import type { Type } from '@nestjs/common';
+import { HttpStatus, Type } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { BaseResponseDto } from '../dtos/base-response.dto';
+const createBaseResponse = (message: string, statusCode: HttpStatus = HttpStatus.OK) => {
+  class BaseResponse {
+    @ApiProperty({ name: 'status_code', example: statusCode })
+    statusCode: HttpStatus;
 
-const createResponseDto = <T>(DataClass?: Type<T>): Type<unknown> => {
-  if (!DataClass) return class extends BaseResponseDto {};
+    @ApiProperty({ example: message })
+    message: string;
+  }
 
-  class ExtendedResponseDto extends BaseResponseDto {
+  return BaseResponse;
+};
+
+const createDataResponse = <T>(DataClass: Type<T>, message: string, statusCode?: HttpStatus): Type => {
+  class DataResponse extends createBaseResponse(message, statusCode) {
     @ApiProperty({ type: DataClass })
     data: T;
   }
 
-  Object.defineProperty(ExtendedResponseDto, 'name', { value: `Res${DataClass.name}` });
-
-  return ExtendedResponseDto;
+  return DataResponse;
 };
 
-export default createResponseDto;
+export { createBaseResponse, createDataResponse };

@@ -39,6 +39,9 @@ const AppConfig = () => {
         expire: env.OTP_EXPIRE,
         cache: env.OTP_CACHE,
       },
+      session: {
+        expire: env.SESSION_EXPIRE,
+      },
     },
   };
 };

@@ -28,6 +28,7 @@ declare global {
 
       OTP_EXPIRE: string;
       OTP_CACHE: string;
+      SESSION_EXPIRE: string;
     }
   }
 }
