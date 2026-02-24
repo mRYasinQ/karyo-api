@@ -83,6 +83,11 @@ class UserService {
     return;
   }
 
+  async checkUserExistById(id: number) {
+    const user = await this.findOneById(id, { fields: ['id'] });
+    return Boolean(user);
+  }
+
   async checkUserExistByEmail(email: string) {
     const user = await this.findOneByEmail(email, { fields: ['id'] });
     return Boolean(user);

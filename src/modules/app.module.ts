@@ -13,6 +13,7 @@ import TransformResponse from '@/shared/interceptors/transform-response.intercep
 import AuthModule from './auth/auth.module';
 import CommonModule from './common/common.module';
 import RedisModule from './redis/redis.module';
+import SessionModule from './session/session.module';
 import StorageModule from './storage/storage.module';
 import UserModule from './user/user.module';
 
@@ -24,6 +25,7 @@ import UserModule from './user/user.module';
     RedisModule,
     StorageModule,
     UserModule,
+    SessionModule,
     AuthModule,
   ],
   providers: [
