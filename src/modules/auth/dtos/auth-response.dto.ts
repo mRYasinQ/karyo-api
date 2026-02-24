@@ -1,24 +1,37 @@
+import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
-import createResponseDto from '@/shared/utils/create-response-dto';
+import { createDataResponse } from '@/shared/utils/create-response-dto';
+
+import AuthMessage from '../auth.message';
+
+class LoginData {
+  @ApiProperty({ format: 'email' })
+  email: string;
+
+  @ApiProperty()
+  token: string;
+}
 
 class SendOtpData {
-  @ApiProperty({ format: 'email', example: 'user@example.com' })
+  @ApiProperty({ format: 'email' })
   email: string;
 }
 
 class VerifyOtpData {
-  @ApiProperty({ format: 'email', example: 'user@example.com' })
+  @ApiProperty({ format: 'email' })
   email: string;
 
   @ApiProperty({ example: true })
   verified: boolean;
 }
 
-const RegisterResponseDto = createResponseDto();
-const RecoverResponseDto = createResponseDto();
+class LoginResponseDto extends createDataResponse(LoginData, AuthMessage.LOGIN_SUCCESS) {}
 
-const SendOtpResponseDto = createResponseDto(SendOtpData);
-const VerifyOtpResponseDto = createResponseDto(VerifyOtpData);
+class RegisterResponseDto extends createDataResponse(LoginData, AuthMessage.REGISTER_SUCCESS, HttpStatus.CREATED) {}
+class RecoverResponseDto extends createDataResponse(LoginData, AuthMessage.RECOVER_SUCCESS) {}
 
-export { RegisterResponseDto, RecoverResponseDto, SendOtpResponseDto, VerifyOtpResponseDto };
+class SendOtpResponseDto extends createDataResponse(SendOtpData, AuthMessage.SENT_OTP) {}
+class VerifyOtpResponseDto extends createDataResponse(VerifyOtpData, AuthMessage.VERIFIED_OTP) {}
+
+export { LoginResponseDto, RegisterResponseDto, RecoverResponseDto, SendOtpResponseDto, VerifyOtpResponseDto };

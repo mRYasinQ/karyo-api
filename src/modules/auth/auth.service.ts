@@ -1,14 +1,18 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import CommonMessage from '@/shared/constants/common-message';
+import type { UserAgentResult } from '@/shared/decorators/user-agent.decorator';
 import type { EnvConfig } from '@/shared/schemas/env.schema';
 import formatMessage from '@/shared/utils/format-message';
-import { generateOtp } from '@/shared/utils/random';
+import { generateOtp, generateRandomBytes } from '@/shared/utils/random';
 
+import PasswordProvider from '../common/providers/password.provider';
 import RedisService from '../redis/providers/redis.service';
+import SessionService from '../session/session.service';
 import UserService from '../user/user.service';
 import AuthMessage from './auth.message';
-import type { Recover, Register, SendOtp, VerifyOtp } from './dtos/auth.dto';
+import type { Login, Recover, Register, SendOtp, VerifyOtp } from './dtos/auth.dto';
 import type { OtpPayload } from './interfaces/otp-payload.interface';
 
 @Injectable()
@@ -23,12 +27,32 @@ class AuthService {
     private readonly config: ConfigService,
     private readonly redisService: RedisService,
     private readonly userService: UserService,
+    private readonly sessionService: SessionService,
+    private readonly passwordProvider: PasswordProvider,
   ) {
     this.otpExpire = this.config.getOrThrow<EnvConfig['OTP_EXPIRE']>('time.otp.expire');
     this.otpCache = this.config.getOrThrow<EnvConfig['OTP_CACHE']>('time.otp.cache');
   }
 
-  async register(data: Register) {
+  async login(data: Login, agent: UserAgentResult) {
+    const { email, password } = data;
+
+    const user = await this.userService.findOneByEmail(email, { fields: ['id', 'password', 'isActive'] });
+    if (!user) throw new BadRequestException(AuthMessage.CREDENTIALS_INCORRECT);
+
+    const { password: hashedPassword, isActive } = user;
+
+    const isPasswordValid = await this.passwordProvider.compare(password, hashedPassword);
+    if (!isPasswordValid) throw new BadRequestException(AuthMessage.CREDENTIALS_INCORRECT);
+
+    if (!isActive) throw new ForbiddenException(CommonMessage.USER_INACTIVE);
+
+    const token = await this.createToken(user.id, agent);
+
+    return { email, token };
+  }
+
+  async register(data: Register, agent: UserAgentResult) {
     const { email, password, otp } = data;
 
     const key = `${this.prefixRegister}:${email}`;
@@ -41,9 +65,11 @@ class AuthService {
 
     await this.redisService.delete(key);
 
-    await this.userService.create({ email, password, isEmailVerified: true });
+    const user = await this.userService.create({ email, password, isEmailVerified: true });
 
-    return;
+    const token = await this.createToken(user.id, agent);
+
+    return { email, token };
   }
 
   async sendRegisterOtp(data: SendOtp) {
@@ -90,7 +116,7 @@ class AuthService {
     return { email, verified: true };
   }
 
-  async recover(data: Recover) {
+  async recover(data: Recover, agent: UserAgentResult) {
     const { email, password, otp } = data;
 
     const user = await this.userService.findOneByEmail(email, { fields: ['id'] });
@@ -108,7 +134,9 @@ class AuthService {
 
     await this.userService.update(user.id, { password, isEmailVerified: true });
 
-    return;
+    const token = await this.createToken(user.id, agent);
+
+    return { email, token };
   }
 
   async sendRecoverOtp(data: SendOtp) {
@@ -153,6 +181,20 @@ class AuthService {
     await this.redisService.set(key, value, this.otpCache);
 
     return { email, verified: true };
+  }
+
+  private async createToken(userId: number, agent: UserAgentResult) {
+    const { browser, os } = agent;
+
+    const token = generateRandomBytes();
+
+    const tokenExpire = this.config.getOrThrow<EnvConfig['SESSION_EXPIRE']>('time.session.expire');
+    const tokenExpireMs = Date.now() + tokenExpire;
+    const expireAt = new Date(tokenExpireMs);
+
+    await this.sessionService.create({ token, userId, browser, os, expireAt });
+
+    return token;
   }
 }
 
