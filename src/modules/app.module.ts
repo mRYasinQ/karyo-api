@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { LoggerModule } from 'nestjs-pino';
@@ -10,6 +10,7 @@ import AppConfig from '@/configs/app.config';
 import DbConfig from '@/configs/db.config';
 import LoggerConifg from '@/configs/logger.config';
 
+import AppExceptionFilter from '@/shared/filters/app-exception.filter';
 import TransformResponse from '@/shared/interceptors/transform-response.interceptor';
 
 import AuthModule from './auth/auth.module';
@@ -39,6 +40,10 @@ import UserModule from './user/user.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformResponse,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AppExceptionFilter,
     },
   ],
 })
