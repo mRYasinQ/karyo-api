@@ -3,10 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { LoggerModule } from 'nestjs-pino';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 import AppConfig from '@/configs/app.config';
 import DbConfig from '@/configs/db.config';
+import LoggerConifg from '@/configs/logger.config';
 
 import TransformResponse from '@/shared/interceptors/transform-response.interceptor';
 
@@ -21,6 +23,7 @@ import UserModule from './user/user.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [AppConfig] }),
     MikroOrmModule.forRootAsync(DbConfig),
+    LoggerModule.forRootAsync(LoggerConifg),
     CommonModule,
     RedisModule,
     StorageModule,

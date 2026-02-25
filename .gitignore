@@ -3,6 +3,9 @@
 /build
 /node_modules
 
+# logs
+/logs
+
 # dotenv environment variable files
 .env*
 !.env.example
