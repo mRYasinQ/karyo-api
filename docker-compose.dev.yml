@@ -12,21 +12,6 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  pgweb:
-    image: sosedoff/pgweb
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - 8081:8081
-    environment:
-      - PGWEB_DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable
 
   redis:
     image: redis/redis-stack:7.4.0-v8
