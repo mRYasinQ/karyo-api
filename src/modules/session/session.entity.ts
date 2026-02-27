@@ -1,4 +1,4 @@
-import { Entity, Index, ManyToOne, Property } from '@mikro-orm/postgresql';
+import { Entity, ManyToOne, Property } from '@mikro-orm/postgresql';
 
 import BaseEntity from '@/shared/entities/base.entity';
 
@@ -13,8 +13,7 @@ class SessionEntity extends BaseEntity {
   @Property({ length: 60 })
   os: string;
 
-  @Index()
-  @Property({ length: 80, unique: true })
+  @Property({ length: 80, unique: true, index: true })
   token: string;
 
   @ManyToOne({ entity: () => UserEntity, deleteRule: 'cascade', lazy: true })

@@ -1,7 +1,8 @@
-import { Entity, Opt, Property } from '@mikro-orm/postgresql';
+import { Entity, ManyToOne, type Opt, Property } from '@mikro-orm/postgresql';
 
 import BaseEntity from '@/shared/entities/base.entity';
 
+import RoleEntity from '../role/role.entity';
 import UserRepository from './user.repository';
 
 @Entity({ tableName: 'users', repository: () => UserRepository })
@@ -26,6 +27,9 @@ class UserEntity extends BaseEntity {
 
   @Property()
   isEmailVerified: boolean & Opt = false;
+
+  @ManyToOne({ entity: () => RoleEntity, nullable: true, index: true })
+  role: RoleEntity | null = null;
 
   @Property({ type: 'date', nullable: true })
   birthday: Date | null = null;

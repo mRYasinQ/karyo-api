@@ -1,4 +1,4 @@
-import { Entity, Opt, PrimaryKey, Property } from '@mikro-orm/postgresql';
+import { Entity, type Opt, PrimaryKey, Property } from '@mikro-orm/postgresql';
 
 @Entity({ abstract: true })
 abstract class BaseEntity {
