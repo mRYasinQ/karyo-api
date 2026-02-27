@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { createDataResponse } from '@/shared/utils/create-response-dto';
+import { createBaseResponse, createDataResponse } from '@/shared/utils/create-response-dto';
 
 import AuthMessage from '../auth.message';
 
@@ -34,4 +34,6 @@ class RecoverResponseDto extends createDataResponse(LoginData, AuthMessage.RECOV
 class SendOtpResponseDto extends createDataResponse(SendOtpData, AuthMessage.SENT_OTP) {}
 class VerifyOtpResponseDto extends createDataResponse(VerifyOtpData, AuthMessage.VERIFIED_OTP) {}
 
-export { LoginResponseDto, RegisterResponseDto, RecoverResponseDto, SendOtpResponseDto, VerifyOtpResponseDto };
+class LogoutResponseDto extends createBaseResponse(AuthMessage.LOGOUT_SUCCESS) {}
+
+export { LoginResponseDto, RegisterResponseDto, RecoverResponseDto, SendOtpResponseDto, VerifyOtpResponseDto, LogoutResponseDto };

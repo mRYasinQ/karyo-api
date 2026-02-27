@@ -9,7 +9,7 @@ const setupSwagger = (app: INestApplication, appUrl: string) => {
     .setContact('Yasin Abbasi', 'https://mryasinq.ir', 'yasinabbasi.y20@gmail.com')
     .setVersion('0.0.1')
     .addServer(appUrl, 'Stage/Production Server')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', in: 'header' }, 'Bearer Auth')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', in: 'header' })
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

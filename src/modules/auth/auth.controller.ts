@@ -2,13 +2,17 @@ import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
+import CurrentSession from '@/shared/decorators/current-session.decorator';
 import UserAgent, { type UserAgentResult } from '@/shared/decorators/user-agent.decorator';
+
+import type { Session } from '@/shared/types/global';
 
 import AuthMessage from './auth.message';
 import AuthService from './auth.service';
 import { LoginDto, RecoverDto, RegisterDto, SendOtpDto, VerifyOtpDto } from './dtos/auth.dto';
 import {
   LoginResponseDto,
+  LogoutResponseDto,
   RecoverResponseDto,
   RegisterResponseDto,
   SendOtpResponseDto,
@@ -95,6 +99,18 @@ class AuthController {
   })
   verifyRecoverOtp(@Body() body: VerifyOtpDto) {
     return this.authService.verifyRecoverOtp(body);
+  }
+
+  @Post('logout')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.LOGOUT_SUCCESS,
+    summary: 'Logout a user',
+    type: LogoutResponseDto,
+    secure: 'required',
+  })
+  logout(@CurrentSession() currentSession: Session) {
+    return this.authService.logout(currentSession.id);
   }
 }
 

@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import CommonMessage from '@/shared/constants/common-message';
@@ -181,6 +181,27 @@ class AuthService {
     await this.redisService.set(key, value, this.otpCache);
 
     return { email, verified: true };
+  }
+
+  async logout(sessionId: number) {
+    await this.sessionService.deleteById(sessionId);
+    return;
+  }
+
+  async validateToken(token: string) {
+    const session = await this.sessionService.findOneByToken(
+      {
+        token,
+        expireAt: { $gt: new Date() },
+      },
+      {
+        populate: ['user'],
+        fields: ['user.id', '*'],
+      },
+    );
+    if (!session) throw new UnauthorizedException(CommonMessage.AUTHENTICATION_REQUIRED);
+
+    return session;
   }
 
   private async createToken(userId: number, agent: UserAgentResult) {

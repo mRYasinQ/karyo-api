@@ -1,3 +1,7 @@
+import SessionEntity from '@/modules/session/session.entity';
+
+type Session = Omit<SessionEntity, 'user'>;
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -31,6 +35,13 @@ declare global {
       SESSION_EXPIRE: string;
     }
   }
+
+  namespace Express {
+    interface Request {
+      userId?: number;
+      currentSession?: Session;
+    }
+  }
 }
 
-export {};
+export type { Session };

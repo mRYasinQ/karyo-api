@@ -2,6 +2,7 @@ const AuthMessage = {
   LOGIN_SUCCESS: 'ورود با موفقیت انجام شد.',
   REGISTER_SUCCESS: 'ثبت‌نام با موفقیت انجام شد.',
   RECOVER_SUCCESS: 'بازنشانی گذرواژه با موفقیت انجام شد.',
+  LOGOUT_SUCCESS: 'خروج از حساب کاربری با موفقیت انجام شد.',
   SENT_OTP: 'کد تایید ارسال شد.',
   VERIFIED_OTP: 'کد تایید شد.',
   OTP_ALREADY_VERIFIED: 'این کد قبلا تایید شده است.',
