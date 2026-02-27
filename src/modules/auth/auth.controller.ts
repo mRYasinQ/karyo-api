@@ -1,21 +1,24 @@
 import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiTooManyRequestsResponse } from '@nestjs/swagger';
 
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
 import CurrentSession from '@/shared/decorators/current-session.decorator';
+import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
 import UserAgent, { type UserAgentResult } from '@/shared/decorators/user-agent.decorator';
 
 import type { Session } from '@/shared/types/global';
 
 import AuthMessage from './auth.message';
 import AuthService from './auth.service';
-import { LoginDto, RecoverDto, RegisterDto, SendOtpDto, VerifyOtpDto } from './dtos/auth.dto';
+import { LoginDto, RecoverDto, RegisterDto, SendOtpDto, VerifyEmailOtpDto, VerifyOtpDto } from './dtos/auth.dto';
 import {
   LoginResponseDto,
   LogoutResponseDto,
   RecoverResponseDto,
   RegisterResponseDto,
   SendOtpResponseDto,
+  TooManyRequestOtpResponseDto,
+  VerifyEmailOtpResponseDto,
   VerifyOtpResponseDto,
 } from './dtos/auth-response.dto';
 
@@ -53,6 +56,7 @@ class AuthController {
     summary: 'Send OTP to email',
     type: SendOtpResponseDto,
   })
+  @ApiTooManyRequestsResponse({ type: TooManyRequestOtpResponseDto })
   sendRegisterOtp(@Body() body: SendOtpDto) {
     return this.authService.sendRegisterOtp(body);
   }
@@ -86,6 +90,7 @@ class AuthController {
     summary: 'Send OTP to email',
     type: SendOtpResponseDto,
   })
+  @ApiTooManyRequestsResponse({ type: TooManyRequestOtpResponseDto })
   sendRecoverOtp(@Body() body: SendOtpDto) {
     return this.authService.sendRecoverOtp(body);
   }
@@ -99,6 +104,31 @@ class AuthController {
   })
   verifyRecoverOtp(@Body() body: VerifyOtpDto) {
     return this.authService.verifyRecoverOtp(body);
+  }
+
+  @Post('verify-email/send-otp')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.SENT_OTP,
+    summary: 'Send OTP to email',
+    type: SendOtpResponseDto,
+    secure: 'required',
+  })
+  @ApiTooManyRequestsResponse({ type: TooManyRequestOtpResponseDto })
+  sendVerifyEmailOtp(@CurrentUserId() userId: number) {
+    return this.authService.sendVerifyEmailOtp(userId);
+  }
+
+  @Post('verify-email/verify-otp')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: AuthMessage.EMAIL_VERIFIED_SUCCESS,
+    summary: 'Verify OTP',
+    type: VerifyEmailOtpResponseDto,
+    secure: 'required',
+  })
+  verifyEmail(@Body() body: VerifyEmailOtpDto, @CurrentUserId() userId: number) {
+    return this.authService.verifyEmail(userId, body);
   }
 
   @Post('logout')

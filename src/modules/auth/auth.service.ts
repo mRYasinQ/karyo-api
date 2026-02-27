@@ -12,7 +12,7 @@ import RedisService from '../redis/providers/redis.service';
 import SessionService from '../session/session.service';
 import UserService from '../user/user.service';
 import AuthMessage from './auth.message';
-import type { Login, Recover, Register, SendOtp, VerifyOtp } from './dtos/auth.dto';
+import type { Login, Recover, Register, SendOtp, VerifyEmailOtp, VerifyOtp } from './dtos/auth.dto';
 import type { OtpPayload } from './interfaces/otp-payload.interface';
 
 @Injectable()
@@ -22,6 +22,7 @@ class AuthService {
 
   private readonly prefixRegister = 'register';
   private readonly prefixRecover = 'recover';
+  private readonly prefixVerify = 'verify';
 
   constructor(
     private readonly config: ConfigService,
@@ -181,6 +182,46 @@ class AuthService {
     await this.redisService.set(key, value, this.otpCache);
 
     return { email, verified: true };
+  }
+
+  async sendVerifyEmailOtp(userId: number) {
+    const user = await this.userService.findOneById(userId, { fields: ['email', 'isEmailVerified'] });
+    if (!user) throw new UnauthorizedException(CommonMessage.AUTHENTICATION_REQUIRED);
+
+    const { email, isEmailVerified } = user;
+
+    if (isEmailVerified) throw new BadRequestException(AuthMessage.EMAIL_VERIFIED);
+
+    const key = `${this.prefixVerify}:${email}`;
+
+    const { value: otpResult, ttl } = await this.redisService.getWithTtl(key);
+    if (otpResult && ttl && ttl > 0) {
+      throw new HttpException(formatMessage(AuthMessage.WAIT_BEFORE_NEW_OTP, { time: ttl }), HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    const otp = String(generateOtp());
+
+    await this.redisService.set(key, otp, this.otpExpire);
+
+    return { email };
+  }
+
+  async verifyEmail(userId: number, data: VerifyEmailOtp) {
+    const user = await this.userService.findOneById(userId, { fields: ['email'] });
+    if (!user) throw new UnauthorizedException(CommonMessage.AUTHENTICATION_REQUIRED);
+
+    const { email } = user;
+    const key = `${this.prefixVerify}:${email}`;
+
+    const { otp } = data;
+    const otpValue = await this.redisService.get(key);
+    if (otpValue !== otp) throw new BadRequestException(AuthMessage.INVALID_OTP);
+
+    await this.redisService.delete(key);
+
+    await this.userService.update(userId, { isEmailVerified: true });
+
+    return { email, is_email_verified: true };
   }
 
   async logout(sessionId: number) {

@@ -34,5 +34,9 @@ const verifyOtpSchema = baseAuthSchema.omit({ password: true });
 class VerifyOtpDto extends createZodDto(verifyOtpSchema) {}
 type VerifyOtp = z.infer<typeof verifyOtpSchema>;
 
-export type { Login, Register, Recover, SendOtp, VerifyOtp };
-export { LoginDto, RegisterDto, RecoverDto, SendOtpDto, VerifyOtpDto };
+const verifyEmailOtpSchema = baseAuthSchema.pick({ otp: true });
+class VerifyEmailOtpDto extends createZodDto(verifyEmailOtpSchema) {}
+type VerifyEmailOtp = z.infer<typeof verifyEmailOtpSchema>;
+
+export type { Login, Register, Recover, SendOtp, VerifyOtp, VerifyEmailOtp };
+export { LoginDto, RegisterDto, RecoverDto, SendOtpDto, VerifyOtpDto, VerifyEmailOtpDto };
