@@ -7,7 +7,7 @@ import type { Request } from 'express';
 import CommonMessage from '@/shared/constants/common-message';
 
 import AuthService from '../auth.service';
-import { OPTIONAL_AUTH_KEY } from '../decorators/optional-auth.decorator';
+import { AUTH_TYPE_KEY, type AuthType } from '../decorators/auth-type.decorator';
 
 @Injectable()
 class AuthGuard implements CanActivate {
@@ -20,13 +20,16 @@ class AuthGuard implements CanActivate {
     const contextHandler = context.getHandler();
     const contextClass = context.getClass();
 
+    const authType = this.reflector.getAllAndOverride<AuthType>(AUTH_TYPE_KEY, [contextHandler, contextClass]) ?? 'PUBLIC';
+    if (authType === 'PUBLIC') return true;
+
+    const isOptional = authType === 'OPTIONAL';
+
     const http = context.switchToHttp();
     const request = http.getRequest<Request>();
 
     const authorizationHeader = request.headers.authorization;
     const [tokenType, token] = authorizationHeader?.split(' ') ?? [];
-
-    const isOptional = this.reflector.getAllAndOverride<boolean>(OPTIONAL_AUTH_KEY, [contextHandler, contextClass]);
 
     try {
       if (tokenType !== 'Bearer' || !token) throw new UnauthorizedException(CommonMessage.AUTHENTICATION_REQUIRED);

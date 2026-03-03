@@ -1,20 +1,23 @@
-import { applyDecorators, HttpCode, HttpStatus, type Type, UseGuards } from '@nestjs/common';
+import { applyDecorators, HttpCode, HttpStatus, type Type } from '@nestjs/common';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
-import OptionalAuth from '@/modules/auth/decorators/optional-auth.decorator';
-import AuthGuard from '@/modules/auth/guards/auth.guard';
+import SetAuthType, { type AuthType } from '@/modules/auth/decorators/auth-type.decorator';
 
 import UnauthorizedResponseDto from '../dtos/unauthorized-response.dto';
 import SuccessMessage from './success-message.decorator';
 
+type Secure = 'required' | 'optional' | 'no';
+type AuthState = Record<Secure, AuthType>;
 interface ApiStandardOptions {
   status: HttpStatus;
   successMessage: string;
   summary?: string;
   mimeTypes?: string[];
   type?: Type<unknown> | string;
-  secure?: 'required' | 'optional' | 'no';
+  secure?: Secure;
 }
+
+const AUTH_STATE: AuthState = { no: 'PUBLIC', required: 'REQUIRED', optional: 'OPTIONAL' };
 
 const ApiStandard = (options: ApiStandardOptions) => {
   const {
@@ -32,18 +35,11 @@ const ApiStandard = (options: ApiStandardOptions) => {
     ApiOperation({ summary }),
     ApiConsumes(...mimeTypes),
     ApiResponse({ status, type }),
+    SetAuthType(AUTH_STATE[secure]),
   ];
 
-  if (secure !== 'no') {
-    decorators.push(ApiBearerAuth());
-    decorators.push(UseGuards(AuthGuard));
-
-    if (secure === 'required') {
-      decorators.push(ApiUnauthorizedResponse({ type: UnauthorizedResponseDto }));
-    } else {
-      decorators.push(OptionalAuth());
-    }
-  }
+  if (secure !== 'no') decorators.push(ApiBearerAuth());
+  if (secure === 'required') decorators.push(ApiUnauthorizedResponse({ type: UnauthorizedResponseDto }));
 
   return applyDecorators(...decorators);
 };

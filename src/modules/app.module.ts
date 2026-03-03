@@ -36,12 +36,12 @@ import UserModule from './user/user.module';
   ],
   providers: [
     {
-      provide: APP_PIPE,
-      useClass: ZodValidationPipe,
-    },
-    {
       provide: APP_INTERCEPTOR,
       useClass: TransformResponse,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ZodValidationPipe,
     },
     {
       provide: APP_FILTER,

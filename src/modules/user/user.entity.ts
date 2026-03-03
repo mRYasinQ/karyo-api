@@ -28,7 +28,7 @@ class UserEntity extends BaseEntity {
   @Property()
   isEmailVerified: boolean & Opt = false;
 
-  @ManyToOne({ entity: () => RoleEntity, nullable: true, index: true })
+  @ManyToOne({ entity: () => RoleEntity, deleteRule: 'set null', nullable: true, index: true })
   role: RoleEntity | null = null;
 
   @Property({ type: 'date', nullable: true })
