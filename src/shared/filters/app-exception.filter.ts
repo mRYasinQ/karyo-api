@@ -27,7 +27,8 @@ class AppExceptionFilter implements ExceptionFilter {
       }
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
-      message = exception.message;
+      const isNotFoundError = statusCode === HttpStatus.NOT_FOUND;
+      message = isNotFoundError ? CommonMessage.NOT_FOUND : exception.message;
     } else {
       this.logger.error(exception);
     }
