@@ -1,19 +1,15 @@
 const PERMISSIONS = [
   {
-    name: 'نمایش نقش',
-    value: 'SHOW_ROLE',
+    name: 'مدیریت کاربران',
+    value: 'MANAGE_USERS',
   },
   {
-    name: 'ایجاد نقش',
-    value: 'CREATE_ROLE',
+    name: 'مدیریت نقش‌ها',
+    value: 'MANAGE_ROLES',
   },
   {
-    name: 'بروزرسانی نقش',
-    value: 'UPDATE_ROLE',
-  },
-  {
-    name: 'حذف نقش',
-    value: 'DELETE_ROLE',
+    name: 'مدیریت میزکار‌ها',
+    value: 'MANAGE_WORKSPACCE',
   },
 ] as const;
 
@@ -22,4 +18,4 @@ const PERMISSION_LIST = PERMISSIONS.map((p) => p.value);
 
 export { PERMISSION_LIST };
 export type { Permission };
-export default Permissions;
+export default PERMISSIONS;
