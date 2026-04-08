@@ -4,6 +4,7 @@ import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiResponse, ApiUnauthorizedR
 import SetAuthType, { type AuthType } from '@/modules/auth/decorators/auth-type.decorator';
 
 import UnauthorizedResponseDto from '../dtos/unauthorized-response.dto';
+import SetDtoResponse from './set-dto-response-decorator';
 import SuccessMessage from './success-message.decorator';
 
 type Secure = 'required' | 'optional' | 'no';
@@ -38,6 +39,7 @@ const ApiStandard = (options: ApiStandardOptions) => {
     SetAuthType(AUTH_STATE[secure]),
   ];
 
+  if (type) decorators.push(SetDtoResponse(type));
   if (secure !== 'no') decorators.push(ApiBearerAuth());
   if (secure === 'required') decorators.push(ApiUnauthorizedResponse({ type: UnauthorizedResponseDto }));
 

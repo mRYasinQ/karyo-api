@@ -1,5 +1,7 @@
-import { HttpStatus, Type } from '@nestjs/common';
+import { HttpStatus, type Type as NestJsType } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { Expose, Type } from 'class-transformer';
 
 const createErrorResponse = (message: string, statusCode: HttpStatus) => {
   class ErrorResponse {
@@ -15,9 +17,11 @@ const createErrorResponse = (message: string, statusCode: HttpStatus) => {
 
 const createBaseResponse = (message: string, statusCode: HttpStatus = HttpStatus.OK) => {
   class BaseResponse {
+    @Expose()
     @ApiProperty({ name: 'status_code', example: statusCode })
     statusCode: HttpStatus;
 
+    @Expose()
     @ApiProperty({ example: message })
     message: string;
   }
@@ -25,8 +29,10 @@ const createBaseResponse = (message: string, statusCode: HttpStatus = HttpStatus
   return BaseResponse;
 };
 
-const createDataResponse = <T>(DataClass: Type<T>, message: string, statusCode?: HttpStatus): Type => {
+const createDataResponse = <T>(DataClass: NestJsType<T>, message: string, statusCode?: HttpStatus): NestJsType => {
   class DataResponse extends createBaseResponse(message, statusCode) {
+    @Expose()
+    @Type(() => DataClass)
     @ApiProperty({ type: DataClass })
     data: T;
   }
