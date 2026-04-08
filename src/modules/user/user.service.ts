@@ -56,7 +56,7 @@ class UserService {
   }
 
   async update(id: number, data: UpdateUser) {
-    const user = await this.findOneById(id);
+    const user = await this.findOneById(id, { fields: ['id', 'email', 'username'] });
     if (!user) throw new NotFoundException(UserMessage.NOT_FOUND);
 
     const { email, username, isEmailVerified, password } = data;

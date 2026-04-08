@@ -37,7 +37,7 @@ class RoleService {
   }
 
   async update(id: number, data: UpdateRole) {
-    const role = await this.findOneById(id);
+    const role = await this.findOneById(id, { fields: ['id', 'name'] });
     if (!role) throw new NotFoundException(RoleMessage.NOT_FOUND);
 
     const { name } = data;
@@ -62,8 +62,8 @@ class RoleService {
   }
 
   async checkRoleExistByName(name: string) {
-    const user = await this.findOneByName(name, { fields: ['id'] });
-    return Boolean(user);
+    const role = await this.findOneByName(name, { fields: ['id'] });
+    return Boolean(role);
   }
 }
 
