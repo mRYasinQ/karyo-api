@@ -3,6 +3,9 @@
 /build
 /node_modules
 
+# ides settings
+/.vscode
+
 # logs
 /logs
 
