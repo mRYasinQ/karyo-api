@@ -28,7 +28,9 @@ const baseRoleSchema = z.object({
   permissions: permissionsSchema,
 });
 
-const getRolesQuerySchema = baseQuerySchema;
+const getRolesQuerySchema = baseQuerySchema.extend({
+  search: z.string().optional(),
+});
 class GetRolesQueryDto extends createZodDto(getRolesQuerySchema) {}
 type GetRolesQuery = z.infer<typeof getRolesQuerySchema>;
 
