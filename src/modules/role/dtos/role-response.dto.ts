@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 import { type Permission, PERMISSION_LIST } from '@/shared/constants/permission';
-import { createBaseResponse, createDataResponse, createErrorResponse } from '@/shared/utils/create-response-dto';
+import { createBaseResponse, createDataResponse, createErrorResponse, createPaginatedResponse } from '@/shared/utils/create-response-dto';
 
 import RoleMessage from '../role.message';
 
@@ -30,6 +30,7 @@ class RoleData {
   permissions: Permission[];
 }
 
+class GetRolesResponseDto extends createPaginatedResponse(RoleData, RoleMessage.ROLES_GET) {}
 class GetRoleResponseDto extends createDataResponse(RoleData, RoleMessage.ROLE_GET) {}
 class CreateRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_CREATED, HttpStatus.CREATED) {}
 class UpdateRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_UPDATED) {}
@@ -38,4 +39,12 @@ class DeleteRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_DELETED)
 class NotFoundResponseDto extends createErrorResponse(RoleMessage.NOT_FOUND, HttpStatus.NOT_FOUND) {}
 class ExistResponseDto extends createErrorResponse(RoleMessage.ROLE_EXIST, HttpStatus.CONFLICT) {}
 
-export { GetRoleResponseDto, CreateRoleResponseDto, UpdateRoleResponseDto, DeleteRoleResponseDto, NotFoundResponseDto, ExistResponseDto };
+export {
+  GetRolesResponseDto,
+  GetRoleResponseDto,
+  CreateRoleResponseDto,
+  UpdateRoleResponseDto,
+  DeleteRoleResponseDto,
+  NotFoundResponseDto,
+  ExistResponseDto,
+};

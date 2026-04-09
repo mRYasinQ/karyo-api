@@ -1,14 +1,15 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiConflictResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
 
-import { CreateRoleDto, UpdateRoleDto } from './dtos/role.dto';
+import { CreateRoleDto, GetRolesQueryDto, UpdateRoleDto } from './dtos/role.dto';
 import {
   CreateRoleResponseDto,
   DeleteRoleResponseDto,
   ExistResponseDto,
   GetRoleResponseDto,
+  GetRolesResponseDto,
   NotFoundResponseDto,
   UpdateRoleResponseDto,
 } from './dtos/role-response.dto';
@@ -18,6 +19,18 @@ import RoleService from './role.service';
 @Controller('role')
 class RoleController {
   constructor(private readonly roleService: RoleService) {}
+
+  @Get()
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: RoleMessage.ROLES_GET,
+    summary: 'Get roles',
+    type: GetRolesResponseDto,
+    secure: 'required',
+  })
+  getRoles(@Query() query: GetRolesQueryDto) {
+    return this.roleService.findAll(query);
+  }
 
   @Get('/:id')
   @ApiStandard({

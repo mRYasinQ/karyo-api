@@ -2,9 +2,11 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 
 import { EntityManager, wrap } from '@mikro-orm/postgresql';
 
+import { getPaginationOptions, paginate } from '@/shared/utils/pagination';
+
 import type { FindOneMethod } from '@/shared/types/service';
 
-import type { CreateRole, UpdateRole } from './dtos/role.dto';
+import type { CreateRole, GetRolesQuery, UpdateRole } from './dtos/role.dto';
 import RoleEntity from './role.entity';
 import RoleMessage from './role.message';
 import RoleRepository from './role.repository';
@@ -15,6 +17,14 @@ class RoleService {
     private readonly em: EntityManager,
     private readonly roleRepo: RoleRepository,
   ) {}
+
+  async findAll(query: GetRolesQuery) {
+    const { offset, orderBy, limit, page } = getPaginationOptions({ query });
+
+    const [data, total] = await this.roleRepo.findAndCount({}, { limit, offset, orderBy });
+
+    return paginate(data, total, page, limit);
+  }
 
   findOneById: FindOneMethod<RoleEntity, number> = (id, options?) => {
     return this.roleRepo.findOne({ id }, options);

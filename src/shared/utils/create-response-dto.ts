@@ -3,6 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Expose, Type } from 'class-transformer';
 
+import PaginationDto from '../dtos/pagination.dto';
+
 const createErrorResponse = (message: string, statusCode: HttpStatus) => {
   class ErrorResponse {
     @ApiProperty({ name: 'status_code', example: statusCode })
@@ -40,4 +42,20 @@ const createDataResponse = <T>(DataClass: NestJsType<T>, message: string, status
   return DataResponse;
 };
 
-export { createErrorResponse, createBaseResponse, createDataResponse };
+const createPaginatedResponse = <T>(DataClass: NestJsType<T>, message: string, statusCode?: HttpStatus): NestJsType => {
+  class PaginatedResponse extends createBaseResponse(message, statusCode) {
+    @Expose()
+    @Type(() => DataClass)
+    @ApiProperty({ type: DataClass, isArray: true })
+    data: T[];
+
+    @Expose({ groups: ['paginated'] })
+    @Type(() => PaginationDto)
+    @ApiProperty({ type: PaginationDto })
+    pagination: PaginationDto;
+  }
+
+  return PaginatedResponse;
+};
+
+export { createErrorResponse, createBaseResponse, createDataResponse, createPaginatedResponse };

@@ -1,4 +1,5 @@
 const RoleMessage = {
+  ROLES_GET: 'نقش‌ها دریافت شدند.',
   ROLE_GET: 'نقش دریافت شد.',
   ROLE_CREATED: 'نقش ایجاد شد.',
   ROLE_UPDATED: 'نقش بروزرسانی شد.',

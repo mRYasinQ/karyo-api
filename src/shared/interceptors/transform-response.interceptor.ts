@@ -10,12 +10,13 @@ import snakecaseKeys from 'snakecase-keys';
 
 import { DTO_RESPONSE_KEY } from '../decorators/set-dto-response-decorator';
 import { SUCCESS_MESSAGE_KEY } from '../decorators/success-message.decorator';
+import type { Pagination } from '../utils/pagination';
 
 interface ApiResponse {
   statusCode: number;
   data?: unknown;
   message: string;
-  pagination?: unknown;
+  pagination?: Pagination;
 }
 
 @Injectable()
@@ -34,11 +35,13 @@ class TransformResponse implements NestInterceptor<unknown, ApiResponse> {
     return next.handle().pipe(
       map((data: unknown) => {
         let finalData: unknown = data;
-        let pagination: unknown = undefined;
+        let pagination: Pagination | undefined = undefined;
+        let hasPagination = false;
 
         if (Array.isArray(data)) {
           finalData = data[0];
-          pagination = data[1] as unknown;
+          pagination = data[1] as Pagination;
+          hasPagination = pagination.limit !== undefined;
         }
 
         const rawResponse: ApiResponse = {
@@ -51,7 +54,11 @@ class TransformResponse implements NestInterceptor<unknown, ApiResponse> {
         let processedResponse: unknown = rawResponse;
 
         if (dtoClass) {
-          processedResponse = plainToInstance(dtoClass, rawResponse, { enableImplicitConversion: true, excludeExtraneousValues: true });
+          processedResponse = plainToInstance(dtoClass, rawResponse, {
+            enableImplicitConversion: true,
+            excludeExtraneousValues: true,
+            groups: hasPagination ? ['paginated'] : [],
+          });
         }
 
         const plainResponseBody = JSON.parse(JSON.stringify(processedResponse)) as Record<string, unknown>;
