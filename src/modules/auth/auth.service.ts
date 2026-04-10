@@ -236,8 +236,8 @@ class AuthService {
         expireAt: { $gt: new Date() },
       },
       {
-        populate: ['user'],
-        fields: ['user.id', '*'],
+        populate: ['user', 'user.role'],
+        fields: ['user.id', 'user.role.permissions', '*'],
       },
     );
     if (!session) throw new UnauthorizedException(CommonMessage.AUTHENTICATION_REQUIRED);

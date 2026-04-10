@@ -38,6 +38,7 @@ class AuthGuard implements CanActivate {
 
       request.userId = user.id;
       request.currentSession = sessionData;
+      request.userPermissions = user.role?.permissions ?? [];
 
       return true;
     } catch (error) {

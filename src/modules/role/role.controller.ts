@@ -26,7 +26,7 @@ class RoleController {
     successMessage: RoleMessage.ROLES_GET,
     summary: 'Get roles',
     type: GetRolesResponseDto,
-    secure: 'required',
+    permissions: ['SHOW_ROLE'],
   })
   getRoles(@Query() query: GetRolesQueryDto) {
     return this.roleService.findAll(query);
@@ -38,7 +38,7 @@ class RoleController {
     successMessage: RoleMessage.ROLE_GET,
     summary: 'Get role',
     type: GetRoleResponseDto,
-    secure: 'required',
+    permissions: ['SHOW_ROLE'],
   })
   @ApiNotFoundResponse({ type: NotFoundResponseDto })
   async getRole(@Param('id') id: string) {
@@ -54,7 +54,7 @@ class RoleController {
     successMessage: RoleMessage.ROLE_CREATED,
     summary: 'Create role',
     type: CreateRoleResponseDto,
-    secure: 'required',
+    permissions: ['CREATE_ROLE'],
   })
   @ApiConflictResponse({ type: ExistResponseDto })
   creteRole(@Body() body: CreateRoleDto) {
@@ -67,7 +67,7 @@ class RoleController {
     successMessage: RoleMessage.ROLE_UPDATED,
     summary: 'Update role',
     type: UpdateRoleResponseDto,
-    secure: 'required',
+    permissions: ['UPDATE_ROLE'],
   })
   @ApiConflictResponse({ type: ExistResponseDto })
   @ApiNotFoundResponse({ type: NotFoundResponseDto })
@@ -81,7 +81,7 @@ class RoleController {
     successMessage: RoleMessage.ROLE_DELETED,
     summary: 'Delete role',
     type: DeleteRoleResponseDto,
-    secure: 'required',
+    permissions: ['DELETE_ROLE'],
   })
   @ApiNotFoundResponse({ type: NotFoundResponseDto })
   deleteRole(@Param('id') id: string) {

@@ -1,15 +1,19 @@
 const PERMISSIONS = [
   {
-    name: 'مدیریت کاربران',
-    value: 'MANAGE_USERS',
+    name: 'مشاهده نقش',
+    value: 'SHOW_ROLE',
   },
   {
-    name: 'مدیریت نقش‌ها',
-    value: 'MANAGE_ROLES',
+    name: 'ایجاد نقش',
+    value: 'CREATE_ROLE',
   },
   {
-    name: 'مدیریت میزکار‌ها',
-    value: 'MANAGE_WORKSPACCE',
+    name: 'ویرایش نقش',
+    value: 'UPDATE_ROLE',
+  },
+  {
+    name: 'ویرایش نقش',
+    value: 'DELETE_ROLE',
   },
 ] as const;
 

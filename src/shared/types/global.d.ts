@@ -1,5 +1,7 @@
 import SessionEntity from '@/modules/session/session.entity';
 
+import type { Permission } from '../constants/permission';
+
 type Session = Omit<SessionEntity, 'user'>;
 
 declare global {
@@ -40,6 +42,7 @@ declare global {
     interface Request {
       userId?: number;
       currentSession?: Session;
+      userPermissions: Permission[];
     }
   }
 }
