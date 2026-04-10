@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiConflictResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
@@ -41,8 +41,8 @@ class RoleController {
     permissions: ['SHOW_ROLE'],
   })
   @ApiNotFoundResponse({ type: NotFoundResponseDto })
-  async getRole(@Param('id') id: string) {
-    const role = await this.roleService.findOneById(parseInt(id));
+  async getRole(@Param('id', ParseIntPipe) id: number) {
+    const role = await this.roleService.findOneById(id);
     if (!role) throw new NotFoundException(RoleMessage.NOT_FOUND);
 
     return role;
@@ -71,8 +71,8 @@ class RoleController {
   })
   @ApiConflictResponse({ type: ExistResponseDto })
   @ApiNotFoundResponse({ type: NotFoundResponseDto })
-  updateRole(@Param('id') id: string, @Body() body: UpdateRoleDto) {
-    return this.roleService.update(parseInt(id), body);
+  updateRole(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateRoleDto) {
+    return this.roleService.update(id, body);
   }
 
   @Delete('/:id')
@@ -84,8 +84,8 @@ class RoleController {
     permissions: ['DELETE_ROLE'],
   })
   @ApiNotFoundResponse({ type: NotFoundResponseDto })
-  deleteRole(@Param('id') id: string) {
-    return this.roleService.delete(parseInt(id));
+  deleteRole(@Param('id', ParseIntPipe) id: number) {
+    return this.roleService.delete(id);
   }
 }
 

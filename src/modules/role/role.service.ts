@@ -65,10 +65,8 @@ class RoleService {
   }
 
   async delete(id: number) {
-    const role = await this.findOneById(id, { fields: ['id'] });
-    if (!role) throw new NotFoundException(RoleMessage.NOT_FOUND);
-
-    await this.roleRepo.nativeDelete({ id });
+    const countRole = await this.roleRepo.nativeDelete({ id });
+    if (!countRole) throw new NotFoundException(RoleMessage.NOT_FOUND);
 
     return;
   }
