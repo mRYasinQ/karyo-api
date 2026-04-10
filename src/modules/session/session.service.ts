@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { EntityManager, type FilterQuery } from '@mikro-orm/postgresql';
+
+import { getPaginationOptions, paginate } from '@/shared/utils/pagination';
 
 import type { FindOneMethod } from '@/shared/types/service';
 
 import UserEntity from '../user/user.entity';
+import type { ClearSessions, GetSessionsQuery } from './dtos/session.dto';
 import type { CreateSession } from './interfaces/session.interface';
 import SessionEntity from './session.entity';
+import SessionMessage from './session.message';
 import SessionRepository from './session.repository';
 
 @Injectable()
@@ -16,9 +20,40 @@ class SessionService {
     private readonly sessionRep: SessionRepository,
   ) {}
 
-  findOneById: FindOneMethod<SessionEntity, number> = (id, options?) => {
-    return this.sessionRep.findOne({ id }, options);
-  };
+  async findAllUserSession(query: GetSessionsQuery, userId: number, currentSessionId: number) {
+    const { page, ...findOptions } = getPaginationOptions({ query, isOptional: true });
+
+    const where: FilterQuery<SessionEntity> = { user: { $eq: userId } };
+    const [data, total] = await this.sessionRep.findAndCount(where, findOptions);
+    data.forEach((session) => (session.isCurrent = session.id === currentSessionId));
+
+    return paginate(data, total, page, findOptions.limit);
+  }
+
+  async findOneUserSession(id: number, userId: number, currentSessionId: number) {
+    const session = await this.sessionRep.findOne({ id, user: userId });
+    if (!session) throw new NotFoundException(SessionMessage.NOT_FOUND);
+
+    session.isCurrent = session.id === currentSessionId;
+
+    return session;
+  }
+
+  async deleteUserSession(id: number, userId: number) {
+    const deleteCount = await this.sessionRep.nativeDelete({ id, user: userId });
+    if (!deleteCount) throw new NotFoundException(SessionMessage.NOT_FOUND);
+
+    return;
+  }
+
+  async clearUserSessions(userId: number, currentSessionId: number, data: ClearSessions) {
+    const where: FilterQuery<SessionEntity> = { user: userId };
+    if (!data.include_current) where.id = { $ne: currentSessionId };
+
+    await this.sessionRep.nativeDelete(where);
+
+    return;
+  }
 
   findOneByToken: FindOneMethod<SessionEntity, FilterQuery<SessionEntity>> = (filter, options?) => {
     return this.sessionRep.findOne(filter, options);

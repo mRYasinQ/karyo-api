@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/postgresql';
+import { Entity, ManyToOne, Opt, Property } from '@mikro-orm/postgresql';
 
 import BaseEntity from '@/shared/entities/base.entity';
 
@@ -18,6 +18,9 @@ class SessionEntity extends BaseEntity {
 
   @ManyToOne({ entity: () => UserEntity, deleteRule: 'cascade', lazy: true })
   user: UserEntity;
+
+  @Property({ persist: false })
+  isCurrent: boolean & Opt = false;
 
   @Property()
   expireAt: Date;
