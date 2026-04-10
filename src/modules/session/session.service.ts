@@ -24,14 +24,14 @@ class SessionService {
     const { page, ...findOptions } = getPaginationOptions({ query, isOptional: true });
 
     const where: FilterQuery<SessionEntity> = { user: { $eq: userId } };
-    const [data, total] = await this.sessionRep.findAndCount(where, findOptions);
+    const [data, total] = await this.sessionRep.findAndCount(where, { ...findOptions, exclude: ['token', 'user'] });
     data.forEach((session) => (session.isCurrent = session.id === currentSessionId));
 
     return paginate(data, total, page, findOptions.limit);
   }
 
   async findOneUserSession(id: number, userId: number, currentSessionId: number) {
-    const session = await this.sessionRep.findOne({ id, user: userId });
+    const session = await this.sessionRep.findOne({ id, user: userId }, { exclude: ['token', 'user'] });
     if (!session) throw new NotFoundException(SessionMessage.NOT_FOUND);
 
     session.isCurrent = session.id === currentSessionId;
