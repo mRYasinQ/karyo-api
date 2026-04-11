@@ -8,6 +8,7 @@ import formatMessage from '@/shared/utils/format-message';
 import { generateOtp, generateRandomBytes } from '@/shared/utils/random';
 
 import PasswordProvider from '../common/providers/password.provider';
+import MailService from '../mail/mail.service';
 import RedisService from '../redis/providers/redis.service';
 import SessionService from '../session/session.service';
 import UserService from '../user/user.service';
@@ -30,6 +31,7 @@ class AuthService {
     private readonly userService: UserService,
     private readonly sessionService: SessionService,
     private readonly passwordProvider: PasswordProvider,
+    private readonly mailService: MailService,
   ) {
     this.otpExpire = this.config.getOrThrow<EnvConfig['OTP_EXPIRE']>('time.otp.expire');
     this.otpCache = this.config.getOrThrow<EnvConfig['OTP_CACHE']>('time.otp.cache');
@@ -67,6 +69,12 @@ class AuthService {
     await this.redisService.delete(key);
 
     const user = await this.userService.create({ email, password, isEmailVerified: true });
+    await this.mailService.sendMail({
+      jobName: 'welcome_mail',
+      mail: email,
+      title: 'به کاریو خوش آمدید.',
+      message: 'کاربر عزیز ثبت‌نام شما با موفقیت انجام شد.',
+    });
 
     const token = await this.createToken(user.id, agent);
 
@@ -93,6 +101,12 @@ class AuthService {
     const value = JSON.stringify(payload);
 
     await this.redisService.set(key, value, this.otpExpire);
+    await this.mailService.sendMail({
+      jobName: 'register_code_mail',
+      mail: email,
+      title: 'کد تایید ایمیل',
+      message: `کد تایید ایمیل شما: ${otp}`,
+    });
 
     return { email };
   }
@@ -160,6 +174,12 @@ class AuthService {
     const value = JSON.stringify(payload);
 
     await this.redisService.set(key, value, this.otpExpire);
+    await this.mailService.sendMail({
+      jobName: 'recover_password_mail',
+      mail: email,
+      title: 'کد بازیابی گذرواژه',
+      message: `کد بازیابی شما: ${otp}`,
+    });
 
     return { email };
   }
@@ -202,6 +222,12 @@ class AuthService {
     const otp = String(generateOtp());
 
     await this.redisService.set(key, otp, this.otpExpire);
+    await this.mailService.sendMail({
+      jobName: 'verify_email_mail',
+      mail: email,
+      title: 'کد تایید ایمیل',
+      message: `کد تایید ایمیل شما: ${otp}`,
+    });
 
     return { email };
   }
