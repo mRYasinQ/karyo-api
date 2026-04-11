@@ -7,10 +7,10 @@ import { CreateRoleDto, GetRolesQueryDto, UpdateRoleDto } from './dtos/role.dto'
 import {
   CreateRoleResponseDto,
   DeleteRoleResponseDto,
-  ExistResponseDto,
+  ExistRoleResponseDto,
   GetRoleResponseDto,
   GetRolesResponseDto,
-  NotFoundResponseDto,
+  NotFoundRoleResponseDto,
   UpdateRoleResponseDto,
 } from './dtos/role-response.dto';
 import RoleMessage from './role.message';
@@ -40,7 +40,7 @@ class RoleController {
     type: GetRoleResponseDto,
     permissions: ['SHOW_ROLE'],
   })
-  @ApiNotFoundResponse({ type: NotFoundResponseDto })
+  @ApiNotFoundResponse({ type: NotFoundRoleResponseDto })
   async getRole(@Param('id', ParseIntPipe) id: number) {
     const role = await this.roleService.findOneById(id);
     if (!role) throw new NotFoundException(RoleMessage.NOT_FOUND);
@@ -56,7 +56,7 @@ class RoleController {
     type: CreateRoleResponseDto,
     permissions: ['CREATE_ROLE'],
   })
-  @ApiConflictResponse({ type: ExistResponseDto })
+  @ApiConflictResponse({ type: ExistRoleResponseDto })
   creteRole(@Body() body: CreateRoleDto) {
     return this.roleService.create(body);
   }
@@ -69,8 +69,8 @@ class RoleController {
     type: UpdateRoleResponseDto,
     permissions: ['UPDATE_ROLE'],
   })
-  @ApiConflictResponse({ type: ExistResponseDto })
-  @ApiNotFoundResponse({ type: NotFoundResponseDto })
+  @ApiConflictResponse({ type: ExistRoleResponseDto })
+  @ApiNotFoundResponse({ type: NotFoundRoleResponseDto })
   updateRole(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateRoleDto) {
     return this.roleService.update(id, body);
   }
@@ -83,7 +83,7 @@ class RoleController {
     type: DeleteRoleResponseDto,
     permissions: ['DELETE_ROLE'],
   })
-  @ApiNotFoundResponse({ type: NotFoundResponseDto })
+  @ApiNotFoundResponse({ type: NotFoundRoleResponseDto })
   deleteRole(@Param('id', ParseIntPipe) id: number) {
     return this.roleService.delete(id);
   }

@@ -36,8 +36,8 @@ class CreateRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_CREATED,
 class UpdateRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_UPDATED) {}
 class DeleteRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_DELETED) {}
 
-class NotFoundResponseDto extends createErrorResponse(RoleMessage.NOT_FOUND, HttpStatus.NOT_FOUND) {}
-class ExistResponseDto extends createErrorResponse(RoleMessage.ROLE_EXIST, HttpStatus.CONFLICT) {}
+class NotFoundRoleResponseDto extends createErrorResponse(RoleMessage.NOT_FOUND, HttpStatus.NOT_FOUND) {}
+class ExistRoleResponseDto extends createErrorResponse(RoleMessage.ROLE_EXIST, HttpStatus.CONFLICT) {}
 
 export {
   GetRolesResponseDto,
@@ -45,6 +45,6 @@ export {
   CreateRoleResponseDto,
   UpdateRoleResponseDto,
   DeleteRoleResponseDto,
-  NotFoundResponseDto,
-  ExistResponseDto,
+  NotFoundRoleResponseDto,
+  ExistRoleResponseDto,
 };

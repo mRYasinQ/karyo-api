@@ -42,7 +42,7 @@ class GetSessionResponseDto extends createDataResponse(SessionData, SessionMessa
 class ClearSessionResponseDto extends createBaseResponse(SessionMessage.SESSIONS_CLEAR) {}
 class DeleteSessionResponseDto extends createBaseResponse(SessionMessage.SESSION_DELETE) {}
 
-class NotFoundResponseDto extends createErrorResponse(SessionMessage.NOT_FOUND, HttpStatus.NOT_FOUND) {}
+class NotFoundSessionResponseDto extends createErrorResponse(SessionMessage.NOT_FOUND, HttpStatus.NOT_FOUND) {}
 class DeleteCurrentSessionResponseDto extends createErrorResponse(SessionMessage.CANNOT_DELETE_CURRENT_SESSION, HttpStatus.BAD_REQUEST) {}
 
 export {
@@ -50,6 +50,6 @@ export {
   GetSessionResponseDto,
   ClearSessionResponseDto,
   DeleteSessionResponseDto,
-  NotFoundResponseDto,
+  NotFoundSessionResponseDto,
   DeleteCurrentSessionResponseDto,
 };

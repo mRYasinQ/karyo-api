@@ -14,7 +14,7 @@ import {
   DeleteSessionResponseDto,
   GetSessionResponseDto,
   GetSessionsResponseDto,
-  NotFoundResponseDto,
+  NotFoundSessionResponseDto,
 } from './dtos/session-response.dto';
 import SessionMessage from './session.message';
 import SessionService from './session.service';
@@ -43,13 +43,13 @@ class SessionController {
     type: GetSessionResponseDto,
     secure: 'required',
   })
-  @ApiNotFoundResponse({ type: NotFoundResponseDto })
+  @ApiNotFoundResponse({ type: NotFoundSessionResponseDto })
   getSession(@Param('id', ParseIntPipe) id: number, @CurrentUserId() userId: number, @CurrentSession() currentSession: Session) {
     return this.sessionService.findOneUserSession(id, userId, currentSession.id);
   }
 
   @Delete('/:id')
-  @ApiNotFoundResponse({ type: NotFoundResponseDto })
+  @ApiNotFoundResponse({ type: NotFoundSessionResponseDto })
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: SessionMessage.SESSION_DELETE,
