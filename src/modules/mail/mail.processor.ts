@@ -5,7 +5,7 @@ import { Logger } from 'nestjs-pino';
 
 import { MailerService } from '@nestjs-modules/mailer';
 
-import { MailData, MailProcessResult } from './interfaces/mail.interface';
+import type { MailData, MailProcessResult } from './interfaces/mail.interface';
 
 @Processor('mail')
 class MailProcessor extends WorkerHost {

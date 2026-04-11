@@ -10,7 +10,7 @@ class MailService {
   constructor(@InjectQueue('mail') private readonly mailQueue: Queue) {}
 
   async sendMail(options: SendMailOptions) {
-    const { jobName = 'mail', ...data } = options;
+    const { jobName = 'send_mail', ...data } = options;
 
     await this.mailQueue.add(jobName, data);
   }
