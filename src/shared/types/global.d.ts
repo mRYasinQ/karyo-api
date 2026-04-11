@@ -22,6 +22,7 @@ declare global {
       DB_NAME: string;
 
       MAIL_SECURE: string;
+      MAIL_FROM: string;
       MAIL_HOST: string;
       MAIL_PORT: string;
       MAIL_USER: string;

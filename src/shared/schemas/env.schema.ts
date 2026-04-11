@@ -29,6 +29,7 @@ const envSchema = z.object({
   DB_NAME: requiredStringSchema,
 
   MAIL_SECURE: z.enum(['0', '1']).transform((v) => v === '1'),
+  MAIL_FROM: requiredStringSchema,
   MAIL_HOST: requiredStringSchema,
   MAIL_PORT: portSchema,
   MAIL_USER: requiredStringSchema,

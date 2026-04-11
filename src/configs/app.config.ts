@@ -23,6 +23,7 @@ const AppConfig = () => {
     },
     mail: {
       secure: env.MAIL_SECURE,
+      from: env.MAIL_FROM,
       host: env.MAIL_HOST,
       port: env.MAIL_PORT,
       username: env.MAIL_USER,
