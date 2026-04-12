@@ -30,8 +30,19 @@ class RoleData {
   permissions: Permission[];
 }
 
+class PermissionData {
+  @Expose()
+  @ApiProperty()
+  name: string;
+
+  @Expose()
+  @ApiProperty()
+  value: string;
+}
+
 class GetRolesResponseDto extends createPaginatedResponse(RoleData, RoleMessage.ROLES_GET) {}
 class GetRoleResponseDto extends createDataResponse(RoleData, RoleMessage.ROLE_GET) {}
+class GetPermissionsResponseDto extends createDataResponse(PermissionData, RoleMessage.PERMISSIONS_GET, HttpStatus.OK, true) {}
 class CreateRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_CREATED, HttpStatus.CREATED) {}
 class UpdateRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_UPDATED) {}
 class DeleteRoleResponseDto extends createBaseResponse(RoleMessage.ROLE_DELETED) {}
@@ -42,6 +53,7 @@ class ExistRoleResponseDto extends createErrorResponse(RoleMessage.ROLE_EXIST, H
 export {
   GetRolesResponseDto,
   GetRoleResponseDto,
+  GetPermissionsResponseDto,
   CreateRoleResponseDto,
   UpdateRoleResponseDto,
   DeleteRoleResponseDto,

@@ -31,12 +31,17 @@ const createBaseResponse = (message: string, statusCode: HttpStatus = HttpStatus
   return BaseResponse;
 };
 
-const createDataResponse = <T>(DataClass: NestJsType<T>, message: string, statusCode?: HttpStatus): NestJsType => {
+const createDataResponse = <T>(
+  DataClass: NestJsType<T>,
+  message: string,
+  statusCode?: HttpStatus,
+  isArray: boolean = false,
+): NestJsType => {
   class DataResponse extends createBaseResponse(message, statusCode) {
     @Expose()
     @Type(() => DataClass)
-    @ApiProperty({ type: DataClass })
-    data: T;
+    @ApiProperty({ type: DataClass, isArray })
+    data: T | T[];
   }
 
   return DataResponse;

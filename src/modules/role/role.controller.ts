@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiConflictResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
+import PERMISSIONS from '@/shared/constants/permission';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
 
 import { CreateRoleDto, GetRolesQueryDto, UpdateRoleDto } from './dtos/role.dto';
@@ -8,6 +9,7 @@ import {
   CreateRoleResponseDto,
   DeleteRoleResponseDto,
   ExistRoleResponseDto,
+  GetPermissionsResponseDto,
   GetRoleResponseDto,
   GetRolesResponseDto,
   NotFoundRoleResponseDto,
@@ -16,7 +18,7 @@ import {
 import RoleMessage from './role.message';
 import RoleService from './role.service';
 
-@Controller('role')
+@Controller('roles')
 class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
@@ -30,6 +32,18 @@ class RoleController {
   })
   getRoles(@Query() query: GetRolesQueryDto) {
     return this.roleService.findAll(query);
+  }
+
+  @Get('/permissions')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: RoleMessage.PERMISSIONS_GET,
+    summary: 'Get permissions',
+    type: GetPermissionsResponseDto,
+    permissions: ['SHOW_ROLE'],
+  })
+  getPermissions() {
+    return [PERMISSIONS, {}];
   }
 
   @Get('/:id')
