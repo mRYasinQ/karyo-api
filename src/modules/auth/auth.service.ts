@@ -68,7 +68,7 @@ class AuthService {
 
     await this.redisService.delete(key);
 
-    const user = await this.userService.create({ email, password, isEmailVerified: true });
+    const user = await this.userService.create({ email, password, is_email_verified: true });
     await this.mailService.sendMail({
       jobName: 'welcome_mail',
       mail: email,
@@ -147,7 +147,7 @@ class AuthService {
 
     await this.redisService.delete(key);
 
-    await this.userService.update(user.id, { password, isEmailVerified: true });
+    await this.userService.update(user.id, { password, is_email_verified: true });
 
     const token = await this.createToken(user.id, agent);
 
@@ -245,7 +245,7 @@ class AuthService {
 
     await this.redisService.delete(key);
 
-    await this.userService.update(userId, { isEmailVerified: true });
+    await this.userService.update(userId, { is_email_verified: true });
 
     return { email, is_email_verified: true };
   }

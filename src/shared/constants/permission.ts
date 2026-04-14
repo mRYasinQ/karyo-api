@@ -15,6 +15,22 @@ const PERMISSIONS = [
     name: 'ویرایش نقش',
     value: 'DELETE_ROLE',
   },
+  {
+    name: 'مشاهده کاربر',
+    value: 'SHOW_USER',
+  },
+  {
+    name: 'ایجاد کاربر',
+    value: 'CREATE_USER',
+  },
+  {
+    name: 'ویرایش کاربر',
+    value: 'UPDATE_USER',
+  },
+  {
+    name: 'ویرایش کاربر',
+    value: 'DELETE_USER',
+  },
 ] as const;
 
 type Permission = (typeof PERMISSIONS)[number]['value'];

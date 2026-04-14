@@ -22,6 +22,9 @@ class UserEntity extends BaseEntity {
   @Property({ type: 'text' })
   password: string;
 
+  @Property({ nullable: true })
+  avatar: string | null = null;
+
   @Property()
   isActive: boolean & Opt = true;
 
