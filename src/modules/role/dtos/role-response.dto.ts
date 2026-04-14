@@ -4,23 +4,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 import { type Permission, PERMISSION_LIST } from '@/shared/constants/permission';
+import BaseResponseDto from '@/shared/dtos/response.dto';
 import { createBaseResponse, createDataResponse, createErrorResponse, createPaginatedResponse } from '@/shared/utils/create-response-dto';
 
 import RoleMessage from '../role.message';
 
-class RoleData {
-  @Expose()
-  @ApiProperty()
-  id: number;
-
-  @Expose()
-  @ApiProperty({ name: 'created_at', format: 'date-time' })
-  createdAt: Date;
-
-  @Expose()
-  @ApiProperty({ name: 'updated_at', format: 'date-time' })
-  updatedAt: Date;
-
+class RoleData extends BaseResponseDto {
   @Expose()
   @ApiProperty()
   name: string;

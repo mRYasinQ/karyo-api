@@ -3,23 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { Expose } from 'class-transformer';
 
+import BaseResponseDto from '@/shared/dtos/response.dto';
 import { createBaseResponse, createDataResponse, createErrorResponse, createPaginatedResponse } from '@/shared/utils/create-response-dto';
 
 import SessionMessage from '../session.message';
 
-class SessionData {
-  @Expose()
-  @ApiProperty()
-  id: number;
-
-  @Expose()
-  @ApiProperty({ name: 'created_at', format: 'date-time' })
-  createdAt: Date;
-
-  @Expose()
-  @ApiProperty({ name: 'updated_at', format: 'date-time' })
-  updatedAt: Date;
-
+class SessionData extends BaseResponseDto {
   @Expose()
   @ApiProperty()
   browser: string;
