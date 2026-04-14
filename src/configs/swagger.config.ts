@@ -1,6 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { cleanupOpenApiDoc } from 'nestjs-zod';
+
 const setupSwagger = (app: INestApplication, appUrl: string) => {
   const swaggerConfig = new DocumentBuilder()
     .setOpenAPIVersion('3.0.1')
@@ -14,7 +16,7 @@ const setupSwagger = (app: INestApplication, appUrl: string) => {
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-  SwaggerModule.setup('docs', app, document, {
+  SwaggerModule.setup('docs', app, cleanupOpenApiDoc(document), {
     customSiteTitle: 'Karyo API | Documentation',
     swaggerOptions: {
       persistAuthorization: true,

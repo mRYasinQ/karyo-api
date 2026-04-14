@@ -28,7 +28,7 @@ declare global {
       MAIL_USER: string;
       MAIL_PASSWORD: string;
 
-      MINIO_HOST: string;
+      MINIO_URL: string;
       MINIO_BUCKET: string;
       MINIO_USER: string;
       MINIO_PASSWORD: string;

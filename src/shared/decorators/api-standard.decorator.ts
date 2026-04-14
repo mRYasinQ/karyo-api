@@ -1,4 +1,5 @@
-import { applyDecorators, HttpCode, HttpStatus, type Type, UseGuards } from '@nestjs/common';
+import { applyDecorators, HttpCode, HttpStatus, type Type, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiForbiddenResponse, ApiOperation, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import SetAuthType, { type AuthType } from '@/modules/auth/decorators/auth-type.decorator';
@@ -13,6 +14,7 @@ import SuccessMessage from './success-message.decorator';
 
 type Secure = 'required' | 'optional' | 'no';
 type AuthState = Record<Secure, AuthType>;
+type FileOptions = { field: string; maxCount?: number };
 interface ApiStandardOptions {
   status: HttpStatus;
   successMessage: string;
@@ -21,6 +23,7 @@ interface ApiStandardOptions {
   type?: Type<unknown> | string;
   secure?: Secure;
   permissions?: Permission[];
+  file?: FileOptions;
 }
 
 const AUTH_STATE: AuthState = { no: 'PUBLIC', required: 'REQUIRED', optional: 'OPTIONAL' };
@@ -32,6 +35,7 @@ const ApiStandard = (options: ApiStandardOptions) => {
     mimeTypes = ['application/x-www-form-urlencoded', 'application/json'],
     summary,
     type,
+    file,
     secure = 'no',
     permissions = [],
   } = options;
@@ -51,6 +55,17 @@ const ApiStandard = (options: ApiStandardOptions) => {
 
   if (finalSecure !== 'no') decorators.push(ApiBearerAuth());
   if (finalSecure === 'required') decorators.push(ApiUnauthorizedResponse({ type: UnauthorizedResponseDto }));
+
+  if (file) {
+    const { field, maxCount } = file;
+
+    if (maxCount === undefined) {
+      decorators.push(UseInterceptors(FileInterceptor(field)));
+    } else {
+      const limit = maxCount > 0 ? maxCount : undefined;
+      decorators.push(UseInterceptors(FilesInterceptor(field, limit)));
+    }
+  }
 
   if (permissions.length) {
     decorators.push(RequirePermissions(...permissions));

@@ -75,6 +75,11 @@ class RoleService {
     const role = await this.findOneByName(name, { fields: ['id'] });
     return Boolean(role);
   }
+
+  async checkRoleExistById(id: number) {
+    const role = await this.findOneById(id, { fields: ['id'] });
+    return Boolean(role);
+  }
 }
 
 export default RoleService;

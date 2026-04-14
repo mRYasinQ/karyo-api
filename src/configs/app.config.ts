@@ -30,7 +30,7 @@ const AppConfig = () => {
       password: env.MAIL_PASSWORD,
     },
     minio: {
-      host: env.MINIO_HOST,
+      url: env.MINIO_URL,
       bucket: env.MINIO_BUCKET,
       username: env.MINIO_USER,
       password: env.MINIO_PASSWORD,

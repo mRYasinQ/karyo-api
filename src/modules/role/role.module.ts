@@ -10,6 +10,7 @@ import RoleService from './role.service';
   imports: [MikroOrmModule.forFeature([RoleEntity])],
   controllers: [RoleController],
   providers: [RoleService],
+  exports: [RoleService],
 })
 class RoleModule {}
 

@@ -35,7 +35,7 @@ const envSchema = z.object({
   MAIL_USER: requiredStringSchema,
   MAIL_PASSWORD: requiredStringSchema,
 
-  MINIO_HOST: requiredStringSchema,
+  MINIO_URL: z.url(),
   MINIO_BUCKET: requiredStringSchema,
   MINIO_USER: requiredStringSchema,
   MINIO_PASSWORD: requiredStringSchema,
