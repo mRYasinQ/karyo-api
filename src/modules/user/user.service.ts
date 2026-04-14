@@ -12,7 +12,7 @@ import type { FindOneMethod } from '@/shared/types/service';
 import PasswordProvider from '../common/providers/password.provider';
 import RoleEntity from '../role/role.entity';
 import RoleService from '../role/role.service';
-import StorageQueue from '../storage/providers/storage.queue';
+import StorageProducer from '../storage/providers/storage.producer';
 import type { CreateUser, GetUsersQuery, UpdateUser } from './dtos/user.dto';
 import UserEntity from './user.entity';
 import UserMessage from './user.message';
@@ -25,30 +25,14 @@ class UserService {
     private readonly userRepo: UserRepository,
     private readonly passwordProvider: PasswordProvider,
     private readonly roleService: RoleService,
-    private readonly storageQueue: StorageQueue,
+    private readonly storageProducer: StorageProducer,
   ) {}
 
   async findAll(query: GetUsersQuery) {
-    const { search, role_id, is_active, is_email_verified, ...paginationQuery } = query;
-    const { page, ...findOptions } = getPaginationOptions({ query: paginationQuery });
-
-    const where: FilterQuery<UserEntity> = {};
-
-    if (search) {
-      where.$or = [
-        { firstName: { $ilike: `%${search}%` } },
-        { lastName: { $ilike: `%${search}%` } },
-        { email: { $ilike: `%${search}%` } },
-        { username: { $ilike: `%${search}%` } },
-      ];
-    }
-    if (role_id) where.role = role_id;
-    if (is_active !== undefined) where.isActive = is_active;
-    if (is_email_verified !== undefined) where.isEmailVerified = is_email_verified;
+    const { page, ...findOptions } = getPaginationOptions({ query });
+    const where = this.buildWhereClause(query);
 
     const [data, total] = await this.userRepo.findAndCount(where, { ...findOptions, populate: ['role.*'] });
-
-    console.log(data);
 
     return paginate(data, total, page, findOptions.limit);
   }
@@ -94,6 +78,8 @@ class UserService {
     const user = await this.findOneById(id, { fields: ['id', 'email', 'username', 'avatar', 'role.id'] });
     if (!user) throw new NotFoundException(UserMessage.NOT_FOUND);
 
+    const userAvatar = user.avatar;
+
     const { role_id } = data;
     const newUserData = toCamelCase<EntityData<UserEntity>>(data);
     const { email, username, password, isEmailVerified } = newUserData;
@@ -115,13 +101,16 @@ class UserService {
     if (checkEmailCondition && isEmailVerified === undefined) newUserData.isEmailVerified = false;
     if (checkRoleCondition && isExistRole) newUserData.role = this.em.getReference(RoleEntity, role_id);
     if (password) newUserData.password = await this.passwordProvider.hash(password);
-    if (avatar) newUserData.avatar = avatar;
+    if (avatar) {
+      newUserData.avatar = avatar;
+    } else if (avatar === null) {
+      newUserData.avatar = null;
+    }
 
     wrap(user).assign(newUserData);
     await this.em.flush();
 
-    const userAvatar = user.avatar;
-    if (avatar && userAvatar) await this.storageQueue.deleteFile({ fileKey: userAvatar });
+    if (userAvatar && (avatar || avatar === null)) await this.storageProducer.deleteFile({ fileKey: userAvatar });
 
     return;
   }
@@ -134,7 +123,7 @@ class UserService {
     await this.em.flush();
 
     const userAvatar = user.avatar;
-    if (userAvatar) await this.storageQueue.deleteFile({ fileKey: userAvatar });
+    if (userAvatar) await this.storageProducer.deleteFile({ fileKey: userAvatar });
 
     return;
   }
@@ -152,6 +141,26 @@ class UserService {
   async checkUserExistByUsername(username: string) {
     const user = await this.findOneByUsername(username, { fields: ['id'] });
     return Boolean(user);
+  }
+
+  private buildWhereClause(query: GetUsersQuery) {
+    const { search, role_id, is_active, is_email_verified } = query;
+
+    const where: FilterQuery<UserEntity> = {};
+
+    if (search) {
+      where.$or = [
+        { firstName: { $ilike: `%${search}%` } },
+        { lastName: { $ilike: `%${search}%` } },
+        { email: { $ilike: `%${search}%` } },
+        { username: { $ilike: `%${search}%` } },
+      ];
+    }
+    if (role_id) where.role = role_id;
+    if (is_active !== undefined) where.isActive = is_active;
+    if (is_email_verified !== undefined) where.isEmailVerified = is_email_verified;
+
+    return where;
   }
 
   private generateUsername() {

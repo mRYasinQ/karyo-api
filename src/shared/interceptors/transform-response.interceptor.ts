@@ -6,10 +6,10 @@ import { plainToInstance } from 'class-transformer';
 import type { Response } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import snakecaseKeys from 'snakecase-keys';
 
 import { DTO_RESPONSE_KEY } from '../decorators/set-dto-response-decorator';
 import { SUCCESS_MESSAGE_KEY } from '../decorators/success-message.decorator';
+import { toSnakeCase } from '../utils/case-transformer';
 import type { Pagination } from '../utils/pagination';
 
 interface ApiResponse {
@@ -62,7 +62,7 @@ class TransformResponse implements NestInterceptor<unknown, ApiResponse> {
         }
 
         const plainResponseBody = JSON.parse(JSON.stringify(processedResponse)) as Record<string, unknown>;
-        const cleanResponseBody = snakecaseKeys(plainResponseBody) as unknown as ApiResponse;
+        const cleanResponseBody = toSnakeCase<ApiResponse>(plainResponseBody);
 
         return cleanResponseBody;
       }),

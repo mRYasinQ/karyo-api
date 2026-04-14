@@ -3,11 +3,13 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Logger } from 'nestjs-pino';
 
+import QUEUES from '@/shared/constants/queues';
+
 import type { StorageData, StorageProcessorResult } from '../interfaces/storage.interface';
 import StorageService from './storage.service';
 
-@Processor('storage')
-class StorageProcessor extends WorkerHost {
+@Processor(QUEUES.STORAGE)
+class StorageConsumer extends WorkerHost {
   constructor(
     private readonly storageService: StorageService,
     private readonly logger: Logger,
@@ -29,4 +31,4 @@ class StorageProcessor extends WorkerHost {
   }
 }
 
-export default StorageProcessor;
+export default StorageConsumer;

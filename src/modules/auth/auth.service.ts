@@ -8,8 +8,8 @@ import formatMessage from '@/shared/utils/format-message';
 import { generateOtp, generateRandomBytes } from '@/shared/utils/random';
 
 import PasswordProvider from '../common/providers/password.provider';
-import MailService from '../mail/mail.service';
-import RedisService from '../redis/providers/redis.service';
+import MailService from '../mail/providers/mail.service';
+import RedisService from '../redis/redis.service';
 import SessionService from '../session/session.service';
 import UserService from '../user/user.service';
 import AuthMessage from './auth.message';

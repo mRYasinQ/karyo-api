@@ -3,14 +3,16 @@ import { Injectable } from '@nestjs/common';
 
 import { Queue } from 'bullmq';
 
-import type { SendMailOptions } from './interfaces/mail.interface';
+import QUEUES from '@/shared/constants/queues';
+
+import type { SendMailOptions } from '../interfaces/mail.interface';
 
 @Injectable()
 class MailService {
-  constructor(@InjectQueue('mail') private readonly mailQueue: Queue) {}
+  constructor(@InjectQueue(QUEUES.MAIL) private readonly mailQueue: Queue) {}
 
   async sendMail(options: SendMailOptions) {
-    const { jobName = 'send_mail', ...data } = options;
+    const { jobName = 'send-mail', ...data } = options;
 
     await this.mailQueue.add(jobName, data);
   }

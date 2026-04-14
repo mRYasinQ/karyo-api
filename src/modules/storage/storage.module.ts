@@ -1,18 +1,20 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 
-import StorageProcessor from './providers/storage.processor';
-import StorageQueue from './providers/storage.queue';
+import QUEUES from '@/shared/constants/queues';
+
+import StorageConsumer from './providers/storage.consumer';
+import StorageProducer from './providers/storage.producer';
 import StorageService from './providers/storage.service';
 
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: 'storage',
+      name: QUEUES.STORAGE,
     }),
   ],
-  providers: [StorageService, StorageProcessor, StorageQueue],
-  exports: [StorageService, StorageQueue],
+  providers: [StorageService, StorageConsumer, StorageProducer],
+  exports: [StorageService, StorageProducer],
 })
 class StorageModule {}
 

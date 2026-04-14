@@ -5,10 +5,12 @@ import { Logger } from 'nestjs-pino';
 
 import { MailerService } from '@nestjs-modules/mailer';
 
-import type { MailData, MailProcessResult } from './interfaces/mail.interface';
+import QUEUES from '@/shared/constants/queues';
 
-@Processor('mail')
-class MailProcessor extends WorkerHost {
+import type { MailData, MailProcessResult } from '../interfaces/mail.interface';
+
+@Processor(QUEUES.MAIL)
+class MailConsumer extends WorkerHost {
   constructor(
     private readonly mailService: MailerService,
     private readonly logger: Logger,
@@ -34,4 +36,4 @@ class MailProcessor extends WorkerHost {
   }
 }
 
-export default MailProcessor;
+export default MailConsumer;
