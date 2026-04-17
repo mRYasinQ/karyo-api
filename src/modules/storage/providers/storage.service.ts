@@ -2,9 +2,11 @@ import path from 'node:path';
 
 import { Injectable, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
 
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import sharp from 'sharp';
 
 import getStorageConfig from '@/configs/storage.config';
 
@@ -16,7 +18,10 @@ class StorageService implements OnModuleInit {
   private client: S3Client;
   private bucket: string;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    private readonly config: ConfigService,
+    private readonly reflector: Reflector,
+  ) {
     this.bucket = config.getOrThrow<EnvConfig['MINIO_BUCKET']>('minio.bucket');
   }
 
@@ -26,11 +31,22 @@ class StorageService implements OnModuleInit {
   }
 
   async uploadFile(file: Express.Multer.File, folder?: string) {
+    let body = file.buffer;
+    let contentType = file.mimetype;
+    let ext = path.extname(file.originalname).toLowerCase();
+
+    const isImage = contentType.startsWith('image/');
+    const isSvg = contentType === 'image/svg+xml';
+
+    if (isImage && !isSvg) {
+      sharp.cache(false);
+      body = await sharp(file.buffer).webp({ quality: 80, effort: 4 }).toBuffer();
+      contentType = 'image/webp';
+      ext = '.webp';
+    }
+
     const hash = md5(generateRandomBytes(16, 'hex') + Date.now());
-
-    const ext = path.extname(file.originalname).toLowerCase();
     const uniqueFileName = `${hash}${ext}`;
-
     const fileKey = folder ? `${folder}/${uniqueFileName}` : uniqueFileName;
 
     const parallelUploads3 = new Upload({
@@ -38,14 +54,18 @@ class StorageService implements OnModuleInit {
       params: {
         Bucket: this.bucket,
         Key: fileKey,
-        Body: file.buffer,
-        ContentType: file.mimetype,
+        Body: body,
+        ContentType: contentType,
       },
     });
 
     await parallelUploads3.done();
 
     return fileKey;
+  }
+
+  uploadFiles(files: Express.Multer.File[], folder?: string) {
+    return Promise.all(files.map((file) => this.uploadFile(file, folder)));
   }
 
   async deleteFile(fileKey: string) {

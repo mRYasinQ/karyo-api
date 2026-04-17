@@ -44,6 +44,7 @@ declare global {
       userId?: number;
       currentSession?: Session;
       userPermissions: Permission[];
+      uploadedFileKey?: string | string[];
     }
   }
 }

@@ -10,12 +10,16 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFile,
 } from '@nestjs/common';
 import { ApiConflictResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
+import type { Request } from 'express';
+
 import STORAGE_FOLDERS from '@/shared/constants/storage-folders';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
+import FileValidationPipe from '@/shared/pipes/file-validation.pipe';
 
 import StorageService from '../storage/providers/storage.service';
 import { CreateUserDto, GetUsersQueryDto, UpdateUserDto } from './dtos/user.dto';
@@ -75,7 +79,7 @@ class UserAdminController {
     type: CreateUserAdminResponseDto,
     mimeTypes: ['multipart/form-data'],
     permissions: ['CREATE_USER'],
-    file: { field: 'avatar' },
+    file: { name: 'avatar' },
   })
   @ApiNotFoundResponse({ type: NotFoundUserRoleResponseDto })
   @ApiConflictResponse({
@@ -91,10 +95,18 @@ class UserAdminController {
       },
     },
   })
-  async createUser(@Body() body: CreateUserDto, @UploadedFile() file?: Express.Multer.File) {
+  async createUser(
+    @Req() req: Request,
+    @Body() body: CreateUserDto,
+    @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] }))
+    file?: Express.Multer.File,
+  ) {
     let fileKey: string | undefined;
 
-    if (file) fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.AVATARS);
+    if (file) {
+      fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.AVATARS);
+      req.uploadedFileKey = fileKey;
+    }
     const result = await this.userService.create(body, fileKey);
 
     return result;
@@ -108,7 +120,7 @@ class UserAdminController {
     type: UpdateUserAdminResponseDto,
     mimeTypes: ['multipart/form-data'],
     permissions: ['UPDATE_USER'],
-    file: { field: 'avatar' },
+    file: { name: 'avatar' },
   })
   @ApiNotFoundResponse({
     type: NotFoundUserResponseDto,
@@ -136,10 +148,19 @@ class UserAdminController {
       },
     },
   })
-  async updateUser(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateUserDto, @UploadedFile() file?: Express.Multer.File) {
+  async updateUser(
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateUserDto,
+    @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] }))
+    file?: Express.Multer.File,
+  ) {
     let fileKey: string | undefined;
 
-    if (file) fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.AVATARS);
+    if (file) {
+      fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.AVATARS);
+      req.uploadedFileKey = fileKey;
+    }
     const result = await this.userService.update(id, body, fileKey);
 
     return result;

@@ -14,7 +14,7 @@ const baseUserSchema = z.object({
   is_email_verified: z.coerce.boolean().optional(),
   role_id: z.coerce.number().optional(),
   birthday: z.iso.date().optional(),
-  avatar: z.file().optional(),
+  avatar: z.file().nullable().optional(),
 });
 
 const getUsersQuerySchema = baseQuerySchema.extend({
