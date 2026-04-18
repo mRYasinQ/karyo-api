@@ -26,6 +26,7 @@ import RoleModule from './role/role.module';
 import SessionModule from './session/session.module';
 import StorageModule from './storage/storage.module';
 import UserModule from './user/user.module';
+import WorkSpaceModule from './workspace/workspace.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import UserModule from './user/user.module';
     ProfileModule,
     SessionModule,
     RoleModule,
+    WorkSpaceModule,
   ],
   providers: [
     {

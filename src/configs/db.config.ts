@@ -16,14 +16,13 @@ const DbConfig: MikroOrmModuleAsyncOptions = {
       warnWhenNoEntities: false,
     },
 
+    autoLoadEntities: true,
+
     host: config.get<EnvConfig['DB_HOST']>('database.host'),
     port: config.get<EnvConfig['DB_PORT']>('database.port'),
     dbName: config.get<EnvConfig['DB_NAME']>('database.name'),
     user: config.get<EnvConfig['DB_USER']>('database.username'),
     password: config.get<EnvConfig['DB_PASSWORD']>('database.password'),
-
-    entities: ['./dist/modules/**/**/*.entity.js'],
-    entitiesTs: ['./src/modules/**/**/*.entity.ts'],
   }),
 };
 
