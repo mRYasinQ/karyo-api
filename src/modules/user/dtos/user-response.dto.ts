@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 import { type Permission, PERMISSION_LIST } from '@/shared/constants/permission';
+import ToStorageUrl from '@/shared/decorators/storage-url.decorator';
 import BaseResponseDto from '@/shared/dtos/response.dto';
 import { createBaseResponse, createDataResponse, createErrorResponse, createPaginatedResponse } from '@/shared/utils/create-response-dto';
 
@@ -38,6 +39,7 @@ class UserAdminData extends BaseResponseDto {
 
   @Expose()
   @ApiProperty({ nullable: true })
+  @ToStorageUrl()
   avatar: string;
 
   @Expose()

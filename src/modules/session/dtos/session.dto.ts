@@ -8,7 +8,7 @@ class GetSessionsQueryDto extends createZodDto(getSessionsQuerySchema) {}
 type GetSessionsQuery = z.infer<typeof getSessionsQuerySchema>;
 
 const clearSessionsSchema = z.object({
-  include_current: z.boolean('مقدار وارد شده برای نشست فعلی باید یک مقدار صحیح یا غلط ( بولین ) باشد.').default(false),
+  include_current: z.coerce.boolean('مقدار وارد شده برای نشست فعلی باید یک مقدار صحیح یا غلط ( بولین ) باشد.').default(false),
 });
 class ClearSessionsDto extends createZodDto(clearSessionsSchema) {}
 type ClearSessions = z.infer<typeof clearSessionsSchema>;

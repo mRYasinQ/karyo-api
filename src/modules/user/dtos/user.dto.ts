@@ -2,20 +2,7 @@ import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 import baseQuerySchema from '@/shared/schemas/base-query.schema';
-import { emailSchema, passwordSchema, usernameSchema } from '@/shared/schemas/user.schema';
-
-const baseUserSchema = z.object({
-  first_name: z.string().min(2).max(30).optional(),
-  last_name: z.string().min(2).max(30).optional(),
-  email: emailSchema,
-  username: usernameSchema.optional(),
-  password: passwordSchema,
-  is_active: z.coerce.boolean().optional(),
-  is_email_verified: z.coerce.boolean().optional(),
-  role_id: z.coerce.number().optional(),
-  birthday: z.iso.date().optional(),
-  avatar: z.file().nullable().optional(),
-});
+import { baseUserSchema } from '@/shared/schemas/user.schema';
 
 const getUsersQuerySchema = baseQuerySchema.extend({
   search: z.string().optional(),

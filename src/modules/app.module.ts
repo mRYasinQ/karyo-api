@@ -20,6 +20,7 @@ import TransformResponse from '@/shared/interceptors/transform-response.intercep
 
 import AuthModule from './auth/auth.module';
 import CommonModule from './common/common.module';
+import ProfileModule from './profile/profile.module';
 import RedisModule from './redis/redis.module';
 import RoleModule from './role/role.module';
 import SessionModule from './session/session.module';
@@ -38,6 +39,7 @@ import UserModule from './user/user.module';
     StorageModule,
     UserModule,
     AuthModule,
+    ProfileModule,
     SessionModule,
     RoleModule,
   ],

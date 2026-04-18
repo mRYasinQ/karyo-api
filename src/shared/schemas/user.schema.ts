@@ -9,4 +9,25 @@ const passwordSchema = z
   .min(8, 'گذرواژه باید حداقل ۸ کارکتر باشد.')
   .max(32, 'گذرواژه می‌تواند حداکثر ۳۲ کاراکتر باشد.');
 
-export { usernameSchema, emailSchema, passwordSchema };
+const baseUserSchema = z.object({
+  first_name: z
+    .string('نام باید رشته باشد.')
+    .min(2, 'نام باید حداقل ۲ کاراکتر باشد.')
+    .max(30, 'نام می‌تواند حداکثر ۳۰ کاراکتر باشد.')
+    .optional(),
+  last_name: z
+    .string('نام خانوادگی باید رشته باشد.')
+    .min(2, 'نام خانوادگی باید حداقل ۲ کاراکتر باشد.')
+    .max(30, 'نام خانوادگی می‌تواند حداکثر ۳۰ کاراکتر باشد.')
+    .optional(),
+  email: emailSchema,
+  username: usernameSchema.optional(),
+  password: passwordSchema,
+  is_active: z.coerce.boolean('مقدار وارد شده برای فعال بودن کاربر باید یک مقدار صحیح یا غلط ( بولین ) باشد.').optional(),
+  is_email_verified: z.coerce.boolean('مقدار وارد شده برای تأیید ایمیل باید یک مقدار صحیح یا غلط ( بولین ) باشد.').optional(),
+  role_id: z.coerce.number('مقدار وارد شده برای شناسه نقش باید یک مقدار عددی باشد.').optional(),
+  birthday: z.iso.date('مقدار وارد شده برای تاریخ تولد باید یک تاریخ معتبر باشد.').optional(),
+  avatar: z.file().nullable().optional(),
+});
+
+export { usernameSchema, emailSchema, passwordSchema, baseUserSchema };
