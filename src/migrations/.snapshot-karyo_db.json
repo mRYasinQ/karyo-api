@@ -576,6 +576,152 @@
     },
     {
       "columns": {
+        "workspace_id": {
+          "name": "workspace_id",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'member'",
+          "comment": null,
+          "enumItems": [
+            "owner",
+            "admin",
+            "member",
+            "guest"
+          ],
+          "mappedType": "enum"
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "name": "workspace_members",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "workspace_id",
+            "user_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "workspace_members_pkey",
+          "unique": true,
+          "primary": true
+        },
+        {
+          "columnNames": [
+            "user_id",
+            "workspace_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "workspace_members_user_id_workspace_id_unique",
+          "unique": true,
+          "primary": false
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "workspace_members_user_id_foreign": {
+          "columnNames": [
+            "user_id"
+          ],
+          "constraintName": "workspace_members_user_id_foreign",
+          "localTableName": "public.workspace_members",
+          "referencedTableName": "public.users",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "workspace_members_workspace_id_foreign": {
+          "columnNames": [
+            "workspace_id"
+          ],
+          "constraintName": "workspace_members_workspace_id_foreign",
+          "localTableName": "public.workspace_members",
+          "referencedTableName": "public.workspaces",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
+      "columns": {
         "id": {
           "name": "id",
           "type": "int4",
@@ -689,7 +835,7 @@
           "mappedType": "string"
         }
       },
-      "name": "workspace_entity",
+      "name": "workspaces",
       "schema": "public",
       "indexes": [
         {
@@ -698,7 +844,7 @@
           ],
           "composite": false,
           "constraint": false,
-          "keyName": "workspace_entity_pkey",
+          "keyName": "workspaces_pkey",
           "unique": true,
           "primary": true
         },
@@ -708,143 +854,13 @@
           ],
           "composite": false,
           "constraint": true,
-          "keyName": "workspace_entity_slug_unique",
+          "keyName": "workspaces_slug_unique",
           "unique": true,
           "primary": false
         }
       ],
       "checks": [],
       "foreignKeys": {},
-      "nativeEnums": {},
-      "comment": null
-    },
-    {
-      "columns": {
-        "workspace_id": {
-          "name": "workspace_id",
-          "type": "int4",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": 32,
-          "scale": 0,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "int4",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": true,
-          "length": null,
-          "precision": 32,
-          "scale": 0,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        },
-        "role": {
-          "name": "role",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [
-            "owner",
-            "admin",
-            "member",
-            "guest"
-          ],
-          "mappedType": "enum"
-        },
-        "joined_at": {
-          "name": "joined_at",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        }
-      },
-      "name": "workspace_member_entity",
-      "schema": "public",
-      "indexes": [
-        {
-          "columnNames": [
-            "workspace_id",
-            "user_id"
-          ],
-          "composite": true,
-          "constraint": false,
-          "keyName": "workspace_member_entity_pkey",
-          "unique": true,
-          "primary": true
-        },
-        {
-          "columnNames": [
-            "user_id",
-            "workspace_id"
-          ],
-          "composite": true,
-          "constraint": true,
-          "keyName": "workspace_member_entity_user_id_workspace_id_unique",
-          "unique": true,
-          "primary": false
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "workspace_member_entity_user_id_foreign": {
-          "columnNames": [
-            "user_id"
-          ],
-          "constraintName": "workspace_member_entity_user_id_foreign",
-          "localTableName": "public.workspace_member_entity",
-          "referencedTableName": "public.users",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        },
-        "workspace_member_entity_workspace_id_foreign": {
-          "columnNames": [
-            "workspace_id"
-          ],
-          "constraintName": "workspace_member_entity_workspace_id_foreign",
-          "localTableName": "public.workspace_member_entity",
-          "referencedTableName": "public.workspace_entity",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        }
-      },
       "nativeEnums": {},
       "comment": null
     }

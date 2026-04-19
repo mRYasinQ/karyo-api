@@ -1,8 +1,10 @@
 import SessionEntity from '@/modules/session/session.entity';
+import { WorkspaceRole } from '@/modules/workspace/constants/workspace-role.constant';
 
 import type { Permission } from '../constants/permission';
 
 type Session = Omit<SessionEntity, 'user'>;
+type ActiveWorkspace = { id: number; slug: string; role: WorkspaceRole; isActive: boolean };
 
 declare global {
   namespace NodeJS {
@@ -44,9 +46,10 @@ declare global {
       userId?: number;
       currentSession?: Session;
       userPermissions: Permission[];
+      activeWorkspace?: ActiveWorkspace;
       uploadedFileKey?: string | string[];
     }
   }
 }
 
-export type { Session };
+export type { Session, ActiveWorkspace };

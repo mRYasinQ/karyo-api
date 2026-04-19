@@ -5,7 +5,7 @@ import BaseEntity from '@/shared/entities/base.entity';
 import WorkspaceRepository from '../repositories/workspace.repository';
 import WorkspaceMemberEntity from './member.entity';
 
-@Entity({ repository: () => WorkspaceRepository })
+@Entity({ tableName: 'workspaces', repository: () => WorkspaceRepository })
 class WorkspaceEntity extends BaseEntity {
   @Property({ length: 50 })
   name: string;

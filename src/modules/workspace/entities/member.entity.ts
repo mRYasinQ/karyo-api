@@ -1,12 +1,13 @@
-import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/postgresql';
+import { Entity, Enum, ManyToOne, type Opt, Property, Unique } from '@mikro-orm/postgresql';
 
 import UserEntity from '@/modules/user/user.entity';
 
-import { WorkspaceRole } from '../constants/workspace-role.constant';
+import { WorkspaceRole } from '@/shared/constants/workspace-role';
+
 import WorkspaceMemberRepository from '../repositories/member.repository';
 import WorkspaceEntity from './workspace.entity';
 
-@Entity({ repository: () => WorkspaceMemberRepository })
+@Entity({ tableName: 'workspace_members', repository: () => WorkspaceMemberRepository })
 @Unique({ properties: ['user', 'workspace'] })
 class WorkspaceMemberEntity {
   @ManyToOne({ entity: () => WorkspaceEntity, primary: true, deleteRule: 'cascade' })
@@ -15,12 +16,15 @@ class WorkspaceMemberEntity {
   @ManyToOne({ entity: () => UserEntity, primary: true, deleteRule: 'cascade' })
   user: UserEntity;
 
+  @Property({ default: false })
+  isActive: boolean & Opt = false;
+
   @Enum(() => WorkspaceRole)
   @Property({ default: WorkspaceRole.MEMBER })
-  role: WorkspaceRole;
+  role: WorkspaceRole & Opt = WorkspaceRole.MEMBER;
 
   @Property({ type: 'datetime' })
-  joinedAt: Date = new Date();
+  joinedAt: Date & Opt = new Date();
 }
 
 export default WorkspaceMemberEntity;
