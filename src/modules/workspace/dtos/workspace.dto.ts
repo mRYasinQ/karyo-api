@@ -1,7 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import baseQuerySchema from '@/shared/schemas/base-query.schema';
 import fileSchema from '@/shared/schemas/file.schema';
+import { emailSchema } from '@/shared/schemas/user.schema';
 
 const WORKSPACE_SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -35,5 +37,21 @@ const adminUpdateWorkspaceSchema = baseWorkspaceSchema.partial();
 class AdminUpdateWorkspaceDto extends createZodDto(adminUpdateWorkspaceSchema) {}
 type AdminUpdateWorkspace = z.infer<typeof adminUpdateWorkspaceSchema>;
 
-export type { CreateWorkspace, UpdateWorkspace, AdminUpdateWorkspace };
-export { CreateWorkspaceDto, UpdateWorkspaceDto, AdminUpdateWorkspaceDto };
+const getInvitationsQuerySchema = baseQuerySchema;
+class GetInvitationsQueryDto extends createZodDto(getInvitationsQuerySchema) {}
+type GetInvitationsQuery = z.infer<typeof getInvitationsQuerySchema>;
+
+const inviteMemberSchema = z.object({
+  email: emailSchema,
+});
+class InviteMemberDto extends createZodDto(inviteMemberSchema) {}
+type InviteMember = z.infer<typeof inviteMemberSchema>;
+
+const inviteMemberRespondSchema = z.object({
+  accept: z.coerce.boolean('وضعیت پذیرش دعوتنامه باید بولین باشد.'),
+});
+class InviteMemberRespondDto extends createZodDto(inviteMemberRespondSchema) {}
+type InviteMemberRespond = z.infer<typeof inviteMemberRespondSchema>;
+
+export type { CreateWorkspace, UpdateWorkspace, AdminUpdateWorkspace, GetInvitationsQuery, InviteMember, InviteMemberRespond };
+export { CreateWorkspaceDto, UpdateWorkspaceDto, AdminUpdateWorkspaceDto, GetInvitationsQueryDto, InviteMemberDto, InviteMemberRespondDto };

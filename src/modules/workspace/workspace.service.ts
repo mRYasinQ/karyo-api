@@ -1,15 +1,18 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { EntityManager, type FilterQuery, wrap } from '@mikro-orm/postgresql';
 
 import CommonMessage from '@/shared/constants/common-message';
 import { WorkspaceRole } from '@/shared/constants/workspace-role';
+import { getPaginationOptions, paginate } from '@/shared/utils/pagination';
 
 import type { FindOneMethod } from '@/shared/types/service';
 
+import MailService from '../mail/providers/mail.service';
 import StorageProducer from '../storage/providers/storage.producer';
 import UserEntity from '../user/user.entity';
-import type { AdminUpdateWorkspace, CreateWorkspace } from './dtos/workspace.dto';
+import UserService from '../user/user.service';
+import type { AdminUpdateWorkspace, CreateWorkspace, GetInvitationsQuery, InviteMember, InviteMemberRespond } from './dtos/workspace.dto';
 import WorkspaceMemberEntity from './entities/member.entity';
 import WorkspaceEntity from './entities/workspace.entity';
 import type { FindMemberOfWorkspaceFilter } from './interfaces/workspace.interface';
@@ -24,6 +27,8 @@ class WorkspaceService {
     private readonly workspaceRep: WorkspaceRepository,
     private readonly memberRepo: WorkspaceMemberRepository,
     private readonly storageProducer: StorageProducer,
+    private readonly mailService: MailService,
+    private readonly userService: UserService,
   ) {}
 
   findOne: FindOneMethod<WorkspaceEntity, FilterQuery<WorkspaceEntity>> = (filter, options?) => {
@@ -45,6 +50,64 @@ class WorkspaceService {
 
     return this.memberRepo.findOne(where, options);
   };
+
+  async getInvitations(userId: number, query: GetInvitationsQuery) {
+    const { page, ...findOptions } = getPaginationOptions({ query, defaultSort: 'joinedAt' });
+
+    const [data, total] = await this.memberRepo.findAndCount(
+      { user: { id: userId }, isActive: false },
+      { ...findOptions, populate: ['workspace'], exclude: ['workspace.members', 'user', 'isActive', 'role'] },
+    );
+
+    return paginate(data, total, page, findOptions.limit);
+  }
+
+  async inviteMember(workspaceId: number, data: InviteMember) {
+    const user = await this.userService.findOneByEmail(data.email, { fields: ['id', 'email', 'firstName'] });
+    if (!user) return;
+
+    const existingMember = await this.findMemberOfWorkspace({ memberId: user.id, identity: workspaceId }, { fields: ['isActive'] });
+    if (existingMember) {
+      if (existingMember.isActive) {
+        throw new BadRequestException(WorkspaceMessage.ALREADY_MEMBER);
+      } else return;
+    }
+
+    this.memberRepo.create({
+      workspace: this.em.getReference(WorkspaceEntity, workspaceId),
+      user: this.em.getReference(UserEntity, user.id),
+      role: WorkspaceRole.MEMBER,
+    });
+
+    const userFirstName = user.firstName ?? 'کاربر';
+
+    await this.em.flush();
+
+    await this.mailService.sendMail({
+      jobName: 'invite_member',
+      mail: user.email,
+      title: 'دعوتنامه در میزکار جدید',
+      message: `${userFirstName} عزیز، دعوتنامه جدیدی برای شما ارسال شده است.`,
+    });
+
+    return;
+  }
+
+  async respondToInvitation(workspaceId: number, userId: number, data: InviteMemberRespond) {
+    const member = await this.findMemberOfWorkspace({ memberId: userId, identity: workspaceId }, { fields: ['isActive'] });
+    if (!member) throw new NotFoundException(WorkspaceMessage.INVITE_NOT_FOUND);
+    if (member.isActive) throw new BadRequestException(WorkspaceMessage.ALREADY_MEMBER);
+
+    if (data.accept) {
+      member.isActive = true;
+    } else {
+      this.em.remove(member);
+    }
+
+    await this.em.flush();
+
+    return;
+  }
 
   async create(data: CreateWorkspace, userId: number) {
     const isExist = await this.checkWorkspaceExistBySlug(data.slug);

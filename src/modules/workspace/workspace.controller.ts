@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, UploadedFile } from '@nestjs/common';
-import { ApiConflictResponse } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, Req, UploadedFile } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiConflictResponse } from '@nestjs/swagger';
 
 import type { Request } from 'express';
 
@@ -14,10 +14,20 @@ import FileValidationPipe from '@/shared/pipes/file-validation.pipe';
 import type { ActiveWorkspace } from '@/shared/types/global';
 
 import StorageService from '../storage/providers/storage.service';
-import { CreateWorkspaceDto, UpdateWorkspaceDto } from './dtos/workspace.dto';
 import {
+  CreateWorkspaceDto,
+  GetInvitationsQueryDto,
+  InviteMemberDto,
+  InviteMemberRespondDto,
+  UpdateWorkspaceDto,
+} from './dtos/workspace.dto';
+import {
+  AlreadyMemberResponseDto,
   CreateWorkspaceResponseDto,
   DeleteWorkspaceResponseDto,
+  GetInvitationsResponseDto,
+  InviteMemberRespondResponseDto,
+  InviteMemberResponseDto,
   SlugExistResponseDto,
   UpdateWorkspaceResponseDto,
 } from './dtos/workspace-response.dto';
@@ -38,12 +48,57 @@ class WorkspaceController {
   })
   getWorkspaces() {}
 
+  @Get('/invitations')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.INVITATIONS_GET,
+    summary: 'Get workspace invitations',
+    type: GetInvitationsResponseDto,
+    secure: 'required',
+  })
+  getInvitations(@Query() query: GetInvitationsQueryDto, @CurrentUserId() userId: number) {
+    return this.workspaceService.getInvitations(userId, query);
+  }
+
   @Get('/:slug')
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: WorkspaceMessage.WORKSPACE_GET,
   })
   getWorkspace() {}
+
+  @Post('/:slug/invitations')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.INVITE_SENT,
+    summary: 'Invite member to workspace',
+    type: InviteMemberResponseDto,
+    secure: 'required',
+  })
+  @SetWorkspacePolicy({ requireActive: true, roles: [WorkspaceRole.OWNER, WorkspaceRole.ADMIN] })
+  @ApiBadRequestResponse({ type: AlreadyMemberResponseDto })
+  inviteMembers(@Param('slug') _slug: string, @Body() body: InviteMemberDto, @CurrentWorkspace() currentWorkspace: ActiveWorkspace) {
+    return this.workspaceService.inviteMember(currentWorkspace.id, body);
+  }
+
+  @Post('/:slug/invitations/respond')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.INVITE_RESPONSE_SENT,
+    summary: 'Respond to workspace invitation',
+    type: InviteMemberRespondResponseDto,
+    secure: 'required',
+  })
+  @SetWorkspacePolicy({ requireActive: false })
+  @ApiBadRequestResponse({ type: AlreadyMemberResponseDto })
+  respondToInvitation(
+    @Param('slug') _slug: string,
+    @Body() body: InviteMemberRespondDto,
+    @CurrentUserId() userId: number,
+    @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
+  ) {
+    return this.workspaceService.respondToInvitation(currentWorkspace.id, userId, body);
+  }
 
   @Post()
   @ApiStandard({
