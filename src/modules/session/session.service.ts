@@ -71,6 +71,10 @@ class SessionService {
   deleteById(id: number) {
     return this.sessionRep.nativeDelete({ id });
   }
+
+  deleteByUserId(userId: number) {
+    return this.sessionRep.nativeDelete({ user: userId });
+  }
 }
 
 export default SessionService;

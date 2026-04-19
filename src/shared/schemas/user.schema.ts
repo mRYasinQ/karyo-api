@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import fileSchema from './file.schema';
+
 const USERNAME_REGEX = /^[a-z][a-z0-9\_]{3,25}$/;
 
 const usernameSchema = z.string('نام کاربری باید رشته باشد.').trim().toLowerCase().regex(USERNAME_REGEX, 'نام کاربری معتبر نمی‌باشد.');
@@ -27,7 +29,7 @@ const baseUserSchema = z.object({
   is_email_verified: z.coerce.boolean('مقدار وارد شده برای تأیید ایمیل باید یک مقدار صحیح یا غلط ( بولین ) باشد.').optional(),
   role_id: z.coerce.number('مقدار وارد شده برای شناسه نقش باید یک مقدار عددی باشد.').optional(),
   birthday: z.iso.date('مقدار وارد شده برای تاریخ تولد باید یک تاریخ معتبر باشد.').optional(),
-  avatar: z.file().nullable().optional(),
+  avatar: fileSchema.nullable().optional(),
 });
 
 export { usernameSchema, emailSchema, passwordSchema, baseUserSchema };

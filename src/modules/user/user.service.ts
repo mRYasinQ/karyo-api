@@ -12,6 +12,7 @@ import type { FindOneMethod } from '@/shared/types/service';
 import PasswordProvider from '../common/providers/password.provider';
 import RoleEntity from '../role/role.entity';
 import RoleService from '../role/role.service';
+import SessionService from '../session/session.service';
 import StorageProducer from '../storage/providers/storage.producer';
 import type { CreateUser, GetUsersQuery, UpdateUser } from './dtos/user.dto';
 import UserEntity from './user.entity';
@@ -24,8 +25,9 @@ class UserService {
     private readonly em: EntityManager,
     private readonly userRepo: UserRepository,
     private readonly passwordProvider: PasswordProvider,
-    private readonly roleService: RoleService,
     private readonly storageProducer: StorageProducer,
+    private readonly roleService: RoleService,
+    private readonly sessionService: SessionService,
   ) {}
 
   async findAll(query: GetUsersQuery) {
@@ -49,7 +51,7 @@ class UserService {
     return this.userRepo.findOne({ username }, options);
   };
 
-  async create(data: CreateUser, avatar?: string) {
+  async create(data: CreateUser) {
     const { email, username, password, role_id } = data;
 
     const checkExistTask: Promise<boolean>[] = [
@@ -68,21 +70,22 @@ class UserService {
     const role = role_id && isExistRole ? this.em.getReference(RoleEntity, role_id) : undefined;
 
     const newUserData = toCamelCase<RequiredEntityData<UserEntity>>(data);
-    const newUser = this.userRepo.create({ ...newUserData, username: newUsername, password: hashedPassword, role, avatar });
+    const newUser = this.userRepo.create({ ...newUserData, username: newUsername, password: hashedPassword, role });
     await this.em.flush();
 
     return newUser;
   }
 
-  async update(id: number, data: UpdateUser, avatar?: string) {
-    const user = await this.findOneById(id, { fields: ['id', 'email', 'username', 'avatar', 'role.id'] });
+  async update(id: number, data: UpdateUser) {
+    const user = await this.findOneById(id, { fields: ['id', 'email', 'username', 'avatar', 'role.id', 'isActive'] });
     if (!user) throw new NotFoundException(UserMessage.NOT_FOUND);
 
     const userAvatar = user.avatar;
+    const userStatus = user.isActive;
 
     const { role_id } = data;
     const newUserData = toCamelCase<EntityData<UserEntity>>(data);
-    const { email, username, password, isEmailVerified } = newUserData;
+    const { email, username, password, isEmailVerified, avatar, isActive } = newUserData;
 
     const checkEmailCondition = email && user.email !== email;
     const checkUsernameCondition = username && user.username !== username;
@@ -101,16 +104,12 @@ class UserService {
     if (checkEmailCondition && isEmailVerified === undefined) newUserData.isEmailVerified = false;
     if (checkRoleCondition && isExistRole) newUserData.role = this.em.getReference(RoleEntity, role_id);
     if (password) newUserData.password = await this.passwordProvider.hash(password);
-    if (avatar) {
-      newUserData.avatar = avatar;
-    } else if (avatar === null) {
-      newUserData.avatar = null;
-    }
 
     wrap(user).assign(newUserData);
     await this.em.flush();
 
     if (userAvatar && (avatar || avatar === null)) await this.storageProducer.deleteFile({ fileKey: userAvatar });
+    if (userStatus && isActive === false) await this.sessionService.deleteByUserId(id);
 
     return;
   }

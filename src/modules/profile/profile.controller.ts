@@ -84,13 +84,12 @@ class ProfileController {
     @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] }))
     file?: Express.Multer.File,
   ) {
-    let fileKey: string | undefined;
-
     if (file) {
-      fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.AVATARS);
+      const fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.AVATARS);
       req.uploadedFileKey = fileKey;
+      body.avatar = fileKey;
     }
-    const result = await this.userService.update(userId, body, fileKey);
+    const result = await this.userService.update(userId, body);
 
     return result;
   }

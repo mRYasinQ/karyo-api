@@ -62,10 +62,8 @@ class WorkspaceController {
     @CurrentUserId() userId: number,
     @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] })) file?: Express.Multer.File,
   ) {
-    let fileKey: string | undefined;
-
     if (file) {
-      fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.WORKSPACE_LOGOS);
+      const fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.WORKSPACE_LOGOS);
       req.uploadedFileKey = fileKey;
       body.logo = fileKey;
     }
@@ -91,10 +89,8 @@ class WorkspaceController {
     @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
     @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] })) file?: Express.Multer.File,
   ) {
-    let fileKey: string | undefined;
-
     if (file) {
-      fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.WORKSPACE_LOGOS);
+      const fileKey = await this.storageService.uploadFile(file, STORAGE_FOLDERS.WORKSPACE_LOGOS);
       req.uploadedFileKey = fileKey;
       body.logo = fileKey;
     }
