@@ -8,6 +8,8 @@ const mikroOrmConfig = defineConfig({
 
   migrations: {
     tableName: 'migrations',
+    path: './dist/migrations',
+    pathTs: './src/migrations',
   },
 
   host: process.env.DB_HOST,

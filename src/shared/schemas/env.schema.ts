@@ -18,6 +18,10 @@ const envSchema = z.object({
   APP_URL: z.url().default('http://localhost:3000'),
   APP_PORT: portSchema.default(3000),
   STORAGE_URL: z.url(),
+  ENABLE_SWAGGER: z
+    .enum(['0', '1'])
+    .default('1')
+    .transform((v) => v === '1'),
 
   REDIS_URL: z.url(),
   REDIS_PASSWORD: requiredStringSchema,

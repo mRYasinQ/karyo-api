@@ -13,6 +13,7 @@ declare global {
       APP_URL: string;
       APP_PORT: string;
       STORAGE_URL: string;
+      ENABLE_SWAGGER: string;
 
       REDIS_URL: string;
       REDIS_PASSWORD: string;

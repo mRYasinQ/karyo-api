@@ -15,11 +15,11 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   const config = app.get(ConfigService);
-  const nodeEnv = config.getOrThrow<EnvConfig['NODE_ENV']>('node_env');
+  const enableSwagger = config.getOrThrow<EnvConfig['ENABLE_SWAGGER']>('app.enable_swagger');
   const url = config.getOrThrow<EnvConfig['APP_URL']>('app.url');
   const port = config.getOrThrow<EnvConfig['APP_PORT']>('app.port');
 
-  if (nodeEnv === 'development') setupSwagger(app, url);
+  if (enableSwagger) setupSwagger(app, url);
 
   await app.listen(port);
 }
