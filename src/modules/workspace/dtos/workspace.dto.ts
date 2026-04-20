@@ -37,6 +37,12 @@ const adminUpdateWorkspaceSchema = baseWorkspaceSchema.partial();
 class AdminUpdateWorkspaceDto extends createZodDto(adminUpdateWorkspaceSchema) {}
 type AdminUpdateWorkspace = z.infer<typeof adminUpdateWorkspaceSchema>;
 
+const getWorkspacesQuerySchema = baseQuerySchema.extend({
+  search: z.string().optional(),
+});
+class GetWorkspacesQueryDto extends createZodDto(getWorkspacesQuerySchema) {}
+type GetWorkspacesQuery = z.infer<typeof getWorkspacesQuerySchema>;
+
 const getInvitationsQuerySchema = baseQuerySchema;
 class GetInvitationsQueryDto extends createZodDto(getInvitationsQuerySchema) {}
 type GetInvitationsQuery = z.infer<typeof getInvitationsQuerySchema>;
@@ -53,5 +59,21 @@ const inviteMemberRespondSchema = z.object({
 class InviteMemberRespondDto extends createZodDto(inviteMemberRespondSchema) {}
 type InviteMemberRespond = z.infer<typeof inviteMemberRespondSchema>;
 
-export type { CreateWorkspace, UpdateWorkspace, AdminUpdateWorkspace, GetInvitationsQuery, InviteMember, InviteMemberRespond };
-export { CreateWorkspaceDto, UpdateWorkspaceDto, AdminUpdateWorkspaceDto, GetInvitationsQueryDto, InviteMemberDto, InviteMemberRespondDto };
+export type {
+  CreateWorkspace,
+  UpdateWorkspace,
+  AdminUpdateWorkspace,
+  GetWorkspacesQuery,
+  GetInvitationsQuery,
+  InviteMember,
+  InviteMemberRespond,
+};
+export {
+  CreateWorkspaceDto,
+  UpdateWorkspaceDto,
+  AdminUpdateWorkspaceDto,
+  GetWorkspacesQueryDto,
+  GetInvitationsQueryDto,
+  InviteMemberDto,
+  InviteMemberRespondDto,
+};

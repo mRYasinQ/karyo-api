@@ -5,7 +5,7 @@ import { Expose } from 'class-transformer';
 
 import ToStorageUrl from '@/shared/decorators/storage-url.decorator';
 import BaseResponseDto from '@/shared/dtos/response.dto';
-import { createBaseResponse, createErrorResponse, createPaginatedResponse } from '@/shared/utils/create-response-dto';
+import { createBaseResponse, createDataResponse, createErrorResponse, createPaginatedResponse } from '@/shared/utils/create-response-dto';
 
 import WorkspaceMessage from '../workspace.message';
 
@@ -28,21 +28,13 @@ class WorkspaceData extends BaseResponseDto {
   description: string;
 }
 
-class InvitationsData {
-  @Expose()
-  @ApiProperty({ type: WorkspaceData })
-  workspace: WorkspaceData;
-
-  @Expose()
-  @ApiProperty({ name: 'joined_at', format: 'date-time' })
-  joinedAt: Date;
-}
-
 class CreateWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_CREATED, HttpStatus.CREATED) {}
 class UpdateWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_UPDATED) {}
 class DeleteWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_DELETED) {}
 
-class GetInvitationsResponseDto extends createPaginatedResponse(InvitationsData, WorkspaceMessage.INVITATIONS_GET) {}
+class GetWorkspacesResponseDto extends createPaginatedResponse(WorkspaceData, WorkspaceMessage.WORKSPACES_GET) {}
+class GetInvitationsResponseDto extends createPaginatedResponse(WorkspaceData, WorkspaceMessage.INVITATIONS_GET) {}
+class GetWorkspaceResponseDto extends createDataResponse(WorkspaceData, WorkspaceMessage.WORKSPACE_GET) {}
 class InviteMemberResponseDto extends createBaseResponse(WorkspaceMessage.INVITE_SENT) {}
 class InviteMemberRespondResponseDto extends createBaseResponse(WorkspaceMessage.INVITE_RESPONSE_SENT) {}
 
@@ -53,7 +45,9 @@ export {
   CreateWorkspaceResponseDto,
   UpdateWorkspaceResponseDto,
   DeleteWorkspaceResponseDto,
+  GetWorkspacesResponseDto,
   GetInvitationsResponseDto,
+  GetWorkspaceResponseDto,
   InviteMemberResponseDto,
   InviteMemberRespondResponseDto,
   SlugExistResponseDto,

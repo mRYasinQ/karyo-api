@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { EntityManager, type FilterQuery, wrap } from '@mikro-orm/postgresql';
+import { EntityManager, type FilterQuery, LoadStrategy, wrap } from '@mikro-orm/postgresql';
 
 import CommonMessage from '@/shared/constants/common-message';
 import { WorkspaceRole } from '@/shared/constants/workspace-role';
@@ -12,7 +12,14 @@ import MailService from '../mail/providers/mail.service';
 import StorageProducer from '../storage/providers/storage.producer';
 import UserEntity from '../user/user.entity';
 import UserService from '../user/user.service';
-import type { AdminUpdateWorkspace, CreateWorkspace, GetInvitationsQuery, InviteMember, InviteMemberRespond } from './dtos/workspace.dto';
+import type {
+  AdminUpdateWorkspace,
+  CreateWorkspace,
+  GetInvitationsQuery,
+  GetWorkspacesQuery,
+  InviteMember,
+  InviteMemberRespond,
+} from './dtos/workspace.dto';
 import WorkspaceMemberEntity from './entities/member.entity';
 import WorkspaceEntity from './entities/workspace.entity';
 import type { FindMemberOfWorkspaceFilter } from './interfaces/workspace.interface';
@@ -24,7 +31,7 @@ import WorkspaceMessage from './workspace.message';
 class WorkspaceService {
   constructor(
     private readonly em: EntityManager,
-    private readonly workspaceRep: WorkspaceRepository,
+    private readonly workspaceRepo: WorkspaceRepository,
     private readonly memberRepo: WorkspaceMemberRepository,
     private readonly storageProducer: StorageProducer,
     private readonly mailService: MailService,
@@ -32,7 +39,7 @@ class WorkspaceService {
   ) {}
 
   findOne: FindOneMethod<WorkspaceEntity, FilterQuery<WorkspaceEntity>> = (filter, options?) => {
-    return this.workspaceRep.findOne(filter, options);
+    return this.workspaceRepo.findOne(filter, options);
   };
 
   findMemberOfWorkspace: FindOneMethod<WorkspaceMemberEntity, FindMemberOfWorkspaceFilter> = (filter, options?) => {
@@ -51,12 +58,31 @@ class WorkspaceService {
     return this.memberRepo.findOne(where, options);
   };
 
-  async getInvitations(userId: number, query: GetInvitationsQuery) {
-    const { page, ...findOptions } = getPaginationOptions({ query, defaultSort: 'joinedAt' });
+  async getActiveWorkspaces(userId: number, query: GetWorkspacesQuery) {
+    const { search, ...paginationQuery } = query;
+    const { page, ...findOptions } = getPaginationOptions({ query: paginationQuery });
 
-    const [data, total] = await this.memberRepo.findAndCount(
-      { user: { id: userId }, isActive: false },
-      { ...findOptions, populate: ['workspace'], exclude: ['workspace.members', 'user', 'isActive', 'role'] },
+    const where: FilterQuery<WorkspaceEntity> = {
+      members: { user: userId, isActive: true },
+    };
+
+    if (search) where.name = { $ilike: `%${search}%` };
+
+    const [data, total] = await this.workspaceRepo.findAndCount(where, {
+      ...findOptions,
+      exclude: ['members'],
+      strategy: LoadStrategy.JOINED,
+    });
+
+    return paginate(data, total, page, findOptions.limit);
+  }
+
+  async getInvitations(userId: number, query: GetInvitationsQuery) {
+    const { page, ...findOptions } = getPaginationOptions({ query });
+
+    const [data, total] = await this.workspaceRepo.findAndCount(
+      { members: { user: userId, isActive: false } },
+      { ...findOptions, exclude: ['members'], strategy: LoadStrategy.JOINED },
     );
 
     return paginate(data, total, page, findOptions.limit);

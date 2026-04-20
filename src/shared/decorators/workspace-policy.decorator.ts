@@ -5,7 +5,7 @@ import WorkspaceGuard from '@/modules/workspace/guards/workspace.guard';
 
 import { WorkspaceRole } from '../constants/workspace-role';
 import ForbiddenResponseDto from '../dtos/forbidden-response.dto';
-import { NotFoundWorkspaceException } from '../dtos/workspace-response.dto';
+import { NotFoundWorkspaceResponseDto } from '../dtos/workspace-response.dto';
 
 interface WorkspacePolicyOptions {
   roles?: WorkspaceRole[];
@@ -18,7 +18,7 @@ const SetWorkspacePolicy = (options: WorkspacePolicyOptions = { requireActive: t
   return applyDecorators(
     SetMetadata(WORKSPACE_POLICY_KEY, options),
     UseGuards(WorkspaceGuard),
-    ApiNotFoundResponse({ type: NotFoundWorkspaceException }),
+    ApiNotFoundResponse({ type: NotFoundWorkspaceResponseDto }),
     ApiForbiddenResponse({ type: ForbiddenResponseDto }),
   );
 };

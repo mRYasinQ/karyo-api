@@ -1,14 +1,16 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, Req, UploadedFile } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiConflictResponse } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post, Query, Req, UploadedFile } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 import type { Request } from 'express';
 
+import CommonMessage from '@/shared/constants/common-message';
 import STORAGE_FOLDERS from '@/shared/constants/storage-folders';
 import { WorkspaceRole } from '@/shared/constants/workspace-role';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
 import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
 import CurrentWorkspace from '@/shared/decorators/current-workspace.decorator';
 import SetWorkspacePolicy from '@/shared/decorators/workspace-policy.decorator';
+import { NotFoundWorkspaceResponseDto } from '@/shared/dtos/workspace-response.dto';
 import FileValidationPipe from '@/shared/pipes/file-validation.pipe';
 
 import type { ActiveWorkspace } from '@/shared/types/global';
@@ -17,6 +19,7 @@ import StorageService from '../storage/providers/storage.service';
 import {
   CreateWorkspaceDto,
   GetInvitationsQueryDto,
+  GetWorkspacesQueryDto,
   InviteMemberDto,
   InviteMemberRespondDto,
   UpdateWorkspaceDto,
@@ -26,6 +29,8 @@ import {
   CreateWorkspaceResponseDto,
   DeleteWorkspaceResponseDto,
   GetInvitationsResponseDto,
+  GetWorkspaceResponseDto,
+  GetWorkspacesResponseDto,
   InviteMemberRespondResponseDto,
   InviteMemberResponseDto,
   SlugExistResponseDto,
@@ -45,8 +50,13 @@ class WorkspaceController {
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: WorkspaceMessage.WORKSPACES_GET,
+    summary: 'Get active workspaces of user',
+    type: GetWorkspacesResponseDto,
+    secure: 'required',
   })
-  getWorkspaces() {}
+  getWorkspaces(@Query() query: GetWorkspacesQueryDto, @CurrentUserId() userId: number) {
+    return this.workspaceService.getActiveWorkspaces(userId, query);
+  }
 
   @Get('/invitations')
   @ApiStandard({
@@ -64,8 +74,16 @@ class WorkspaceController {
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: WorkspaceMessage.WORKSPACE_GET,
+    summary: 'Get workspace',
+    type: GetWorkspaceResponseDto,
   })
-  getWorkspace() {}
+  @ApiNotFoundResponse({ type: NotFoundWorkspaceResponseDto })
+  async getWorkspace(@Param('slug') slug: string) {
+    const workspace = await this.workspaceService.findOne({ slug }, { exclude: ['members'] });
+    if (!workspace) throw new NotFoundException(CommonMessage.WORKSPACE_NOT_FOUND);
+
+    return workspace;
+  }
 
   @Post('/:slug/invitations')
   @ApiStandard({
