@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 
 import { Expose } from 'class-transformer';
 
@@ -20,7 +20,7 @@ class PrivateProfileRoleData extends BaseResponseDto {
   permissions: Permission[];
 }
 
-class PublicProfileRoleData extends BaseResponseDto {
+class PublicProfileRoleData extends PickType(BaseResponseDto, ['id', 'createdAt']) {
   @Expose()
   @ApiProperty()
   name: string;
@@ -65,7 +65,7 @@ class PrivateProfileData extends BaseResponseDto {
   birthday: Date;
 }
 
-class PublicProfileData extends BaseResponseDto {
+class PublicProfileData extends PickType(BaseResponseDto, ['id', 'createdAt']) {
   @Expose()
   @ApiProperty({ name: 'first_name', nullable: true })
   firstName: string;

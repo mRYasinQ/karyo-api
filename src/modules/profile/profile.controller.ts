@@ -48,7 +48,10 @@ class ProfileController {
   })
   @ApiNotFoundResponse({ type: NotFoundProfileResponseDto })
   async getProfileByUsername(@Param() params: GetProfileParamDto) {
-    const user = await this.userService.findOneByUsername(params.username, { populate: ['role.*'] });
+    const user = await this.userService.findOneByUsername(params.username, {
+      populate: ['role.*'],
+      exclude: ['updatedAt', 'role.updatedAt'],
+    });
     if (!user) throw new NotFoundException(ProfileMessage.NOT_FOUND);
 
     return user;
