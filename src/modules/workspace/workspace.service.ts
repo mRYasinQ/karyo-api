@@ -91,7 +91,7 @@ class WorkspaceService {
   }
 
   async findMembersOfWorkspace(workspaceId: number, query: GetMembersWorkspaceQuery) {
-    const { page, ...findOptions } = getPaginationOptions({ query, defaultSort: 'joinedAt' });
+    const { page, ...findOptions } = getPaginationOptions({ query, isOptional: true, defaultSort: 'joinedAt' });
     const where = this.buildWhereClause(workspaceId, query);
 
     const [data, total] = await this.memberRepo.findAndCount(where, {

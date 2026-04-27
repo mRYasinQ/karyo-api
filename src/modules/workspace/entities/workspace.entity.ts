@@ -10,7 +10,7 @@ class WorkspaceEntity extends BaseEntity {
   @Property({ length: 50 })
   name: string;
 
-  @Property({ unique: true })
+  @Property({ unique: true, length: 150 })
   slug: string;
 
   @Property({ nullable: true })
