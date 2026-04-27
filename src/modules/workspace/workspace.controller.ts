@@ -1,4 +1,18 @@
-import { Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post, Query, Req, UploadedFile } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 import type { Request } from 'express';
@@ -19,9 +33,11 @@ import StorageService from '../storage/providers/storage.service';
 import {
   CreateWorkspaceDto,
   GetInvitationsQueryDto,
+  GetMembersWorkspaceQueryDto,
   GetWorkspacesQueryDto,
   InviteMemberDto,
   InviteMemberRespondDto,
+  UpdateRoleMemberDto,
   UpdateWorkspaceDto,
 } from './dtos/workspace.dto';
 import {
@@ -29,11 +45,15 @@ import {
   CreateWorkspaceResponseDto,
   DeleteWorkspaceResponseDto,
   GetInvitationsResponseDto,
+  GetMembersWorkspaceResponseDto,
   GetWorkspaceResponseDto,
   GetWorkspacesResponseDto,
   InviteMemberRespondResponseDto,
   InviteMemberResponseDto,
+  LeaveWorkspaceResponseDto,
+  RemoveMemberResponseDto,
   SlugExistResponseDto,
+  UpdateRoleMemberResponseDto,
   UpdateWorkspaceResponseDto,
 } from './dtos/workspace-response.dto';
 import WorkspaceMessage from './workspace.message';
@@ -116,6 +136,73 @@ class WorkspaceController {
     @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
   ) {
     return this.workspaceService.respondToInvitation(currentWorkspace.id, userId, body);
+  }
+
+  @Get('/:slug/members')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.MEMBERS_GET,
+    summary: 'Get members of workspace',
+    type: GetMembersWorkspaceResponseDto,
+    secure: 'required',
+  })
+  @SetWorkspacePolicy({ requireActive: true })
+  getMembers(
+    @Param('slug') _slug: string,
+    @Query() query: GetMembersWorkspaceQueryDto,
+    @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
+  ) {
+    return this.workspaceService.findMembersOfWorkspace(currentWorkspace.id, query);
+  }
+
+  @Patch('/:slug/members/:memberId')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.MEMBER_ROLE_UPDATED,
+    summary: 'Update role of workspace member',
+    type: UpdateRoleMemberResponseDto,
+    secure: 'required',
+  })
+  @SetWorkspacePolicy({ requireActive: true, roles: [WorkspaceRole.OWNER] })
+  updateMemberRole(
+    @Param('slug') _slug: string,
+    @Param('memberId') memberId: number,
+    @Body() body: UpdateRoleMemberDto,
+    @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
+  ) {
+    return this.workspaceService.updateMemberRole(currentWorkspace.id, memberId, body);
+  }
+
+  @Delete('/:slug/members/:memberId')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.MEMBER_REMOVED,
+    summary: 'Remove member from workspace',
+    type: RemoveMemberResponseDto,
+    secure: 'required',
+  })
+  @SetWorkspacePolicy({ requireActive: true, roles: [WorkspaceRole.OWNER, WorkspaceRole.ADMIN] })
+  removeMember(
+    @Param('slug') _slug: string,
+    @Param('memberId') memberId: number,
+    @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
+    @CurrentUserId() userId: number,
+  ) {
+    if (memberId === userId) throw new BadRequestException(WorkspaceMessage.CANNOT_REMOVE_SELF);
+    return this.workspaceService.removeMember(currentWorkspace.id, memberId, currentWorkspace.role as WorkspaceRole);
+  }
+
+  @Post('/:slug/leave')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.MEMBER_LEAVED,
+    summary: 'Leave workspace',
+    type: LeaveWorkspaceResponseDto,
+    secure: 'required',
+  })
+  @SetWorkspacePolicy({ requireActive: true })
+  leaveWorkspace(@Param('slug') _slug: string, @CurrentWorkspace() currentWorkspace: ActiveWorkspace, @CurrentUserId() userId: number) {
+    return this.workspaceService.leaveMember(currentWorkspace.id, userId);
   }
 
   @Post()

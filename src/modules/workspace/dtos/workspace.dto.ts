@@ -1,7 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { WorkspaceRole } from '@/shared/constants/workspace-role';
 import baseQuerySchema from '@/shared/schemas/base-query.schema';
+import booleanStringSchema from '@/shared/schemas/boolean-string.schema';
 import fileSchema from '@/shared/schemas/file.schema';
 import { emailSchema } from '@/shared/schemas/user.schema';
 
@@ -59,6 +61,22 @@ const inviteMemberRespondSchema = z.object({
 class InviteMemberRespondDto extends createZodDto(inviteMemberRespondSchema) {}
 type InviteMemberRespond = z.infer<typeof inviteMemberRespondSchema>;
 
+const getMembersWorkspaceQuerySchema = baseQuerySchema.extend({
+  search: z.string().optional(),
+  is_active: booleanStringSchema.default(true),
+  role: z.enum(WorkspaceRole).optional(),
+});
+class GetMembersWorkspaceQueryDto extends createZodDto(getMembersWorkspaceQuerySchema) {}
+type GetMembersWorkspaceQuery = z.infer<typeof getMembersWorkspaceQuerySchema>;
+
+const updateRoleMemberSchema = z.object({
+  role: z
+    .enum(WorkspaceRole, 'نقش وارد شده معتبر نیست.')
+    .refine((value) => value !== WorkspaceRole.OWNER, 'تغییر نقش به مالک از این طریق امکان پذیر نمی‌باشد.'),
+});
+class UpdateRoleMemberDto extends createZodDto(updateRoleMemberSchema) {}
+type UpdateRoleMember = z.infer<typeof updateRoleMemberSchema>;
+
 export type {
   CreateWorkspace,
   UpdateWorkspace,
@@ -67,6 +85,8 @@ export type {
   GetInvitationsQuery,
   InviteMember,
   InviteMemberRespond,
+  GetMembersWorkspaceQuery,
+  UpdateRoleMember,
 };
 export {
   CreateWorkspaceDto,
@@ -76,4 +96,6 @@ export {
   GetInvitationsQueryDto,
   InviteMemberDto,
   InviteMemberRespondDto,
+  GetMembersWorkspaceQueryDto,
+  UpdateRoleMemberDto,
 };

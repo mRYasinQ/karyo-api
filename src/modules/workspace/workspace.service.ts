@@ -16,9 +16,11 @@ import type {
   AdminUpdateWorkspace,
   CreateWorkspace,
   GetInvitationsQuery,
+  GetMembersWorkspaceQuery,
   GetWorkspacesQuery,
   InviteMember,
   InviteMemberRespond,
+  UpdateRoleMember,
 } from './dtos/workspace.dto';
 import WorkspaceMemberEntity from './entities/member.entity';
 import WorkspaceEntity from './entities/workspace.entity';
@@ -88,6 +90,29 @@ class WorkspaceService {
     return paginate(data, total, page, findOptions.limit);
   }
 
+  async findMembersOfWorkspace(workspaceId: number, query: GetMembersWorkspaceQuery) {
+    const { page, ...findOptions } = getPaginationOptions({ query, defaultSort: 'joinedAt' });
+    const where = this.buildWhereClause(workspaceId, query);
+
+    const [data, total] = await this.memberRepo.findAndCount(where, {
+      ...findOptions,
+      populate: ['user'],
+      exclude: [
+        'isActive',
+        'workspace',
+        'user.password',
+        'user.isActive',
+        'user.isEmailVerified',
+        'user.role',
+        'user.email',
+        'user.updatedAt',
+      ],
+      strategy: LoadStrategy.JOINED,
+    });
+
+    return paginate(data, total, page, findOptions.limit);
+  }
+
   async inviteMember(workspaceId: number, data: InviteMember) {
     const user = await this.userService.findOneByEmail(data.email, { fields: ['id', 'email', 'firstName'] });
     if (!user) return;
@@ -130,6 +155,48 @@ class WorkspaceService {
       this.em.remove(member);
     }
 
+    await this.em.flush();
+
+    return;
+  }
+
+  async updateMemberRole(workspaceId: number, memberId: number, data: UpdateRoleMember) {
+    const member = await this.getValidateWorkspaceMember(workspaceId, memberId);
+    if ((member.role as WorkspaceRole) === WorkspaceRole.OWNER) throw new BadRequestException(WorkspaceMessage.OWNER_ROLE_CANNOT_CHANGE);
+
+    member.role = data.role;
+    await this.em.flush();
+
+    return;
+  }
+
+  async removeMember(workspaceId: number, memberId: number, requestorRole: WorkspaceRole) {
+    const member = await this.findMemberOfWorkspace({ memberId: memberId, identity: workspaceId }, { fields: ['isActive', 'role'] });
+    if (!member) throw new NotFoundException(WorkspaceMessage.MEMBER_NOT_FOUND);
+
+    const memberRole = member.role as WorkspaceRole;
+
+    if (memberRole === WorkspaceRole.OWNER) {
+      throw new BadRequestException(WorkspaceMessage.WORKSPACE_OWNER_CANNOT_LEAVE_OR_REMOVED);
+    }
+
+    if (requestorRole === WorkspaceRole.ADMIN && memberRole === WorkspaceRole.ADMIN) {
+      throw new BadRequestException(WorkspaceMessage.ADMIN_CANNOT_REMOVE_ADMIN);
+    }
+
+    this.em.remove(member);
+    await this.em.flush();
+
+    return;
+  }
+
+  async leaveMember(workspaceId: number, memberId: number) {
+    const member = await this.getValidateWorkspaceMember(workspaceId, memberId);
+    if ((member.role as WorkspaceRole) === WorkspaceRole.OWNER) {
+      throw new BadRequestException(WorkspaceMessage.WORKSPACE_OWNER_CANNOT_LEAVE_OR_REMOVED);
+    }
+
+    this.em.remove(member);
     await this.em.flush();
 
     return;
@@ -192,6 +259,36 @@ class WorkspaceService {
   async checkWorkspaceExistBySlug(slug: string) {
     const workspace = await this.findOne({ slug }, { fields: ['id'] });
     return Boolean(workspace);
+  }
+
+  private async getValidateWorkspaceMember(workspaceId: number, userId: number) {
+    const member = await this.findMemberOfWorkspace({ memberId: userId, identity: workspaceId }, { fields: ['isActive', 'role'] });
+    if (!member || (member && !member.isActive)) throw new NotFoundException(WorkspaceMessage.MEMBER_NOT_FOUND);
+
+    return member;
+  }
+
+  private buildWhereClause(workspaceId: number, query: GetMembersWorkspaceQuery) {
+    const { search, is_active, role } = query;
+
+    const where: FilterQuery<WorkspaceMemberEntity> = {
+      workspace: { id: workspaceId },
+      isActive: is_active,
+    };
+
+    if (search) {
+      where.user = {
+        $or: [
+          { firstName: { $ilike: `%${search}%` } },
+          { lastName: { $ilike: `%${search}%` } },
+          { email: { $ilike: `%${search}%` } },
+          { username: { $ilike: `%${search}%` } },
+        ],
+      };
+    }
+    if (role) where.role = role;
+
+    return where;
   }
 }
 
