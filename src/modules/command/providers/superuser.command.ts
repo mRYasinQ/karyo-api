@@ -1,21 +1,17 @@
+import { ConfigService } from '@nestjs/config';
+
 import { EntityManager, RequestContext } from '@mikro-orm/postgresql';
 import { Command, CommandRunner, InquirerService } from 'nest-commander';
 
 import RoleService from '@/modules/role/role.service';
 
 import { PERMISSION_LIST } from '@/shared/constants/permission';
+import { EnvConfig } from '@/shared/schemas/env.schema';
 import { baseUserSchema } from '@/shared/schemas/user.schema';
 
 import UserService from '../../user/user.service';
+import type { SuperuserData } from '../interfaces/superuser.interface';
 import { SUPERUSER_QUESTION_KEY } from '../questions/superuser.questions';
-
-interface SuperuserData {
-  firstName?: string;
-  lastName?: string;
-  email: string;
-  username?: string;
-  password: string;
-}
 
 @Command({
   name: 'create-superuser',
@@ -24,6 +20,7 @@ interface SuperuserData {
 class SuperuserCommand extends CommandRunner {
   constructor(
     private readonly em: EntityManager,
+    private readonly configService: ConfigService,
     private readonly inquirerService: InquirerService,
     private readonly userService: UserService,
     private readonly roleService: RoleService,
@@ -59,7 +56,9 @@ class SuperuserCommand extends CommandRunner {
     }
   }
 
-  private async findOrCreateRole(roleName: string = 'مدیر'): Promise<number> {
+  private async findOrCreateRole(): Promise<number> {
+    const roleName = this.configService.getOrThrow<EnvConfig['DEFAULT_ROLE']>('app.default_role');
+
     const role = await this.roleService.findOneByName(roleName, { fields: ['id'] });
     if (role) return role.id;
 

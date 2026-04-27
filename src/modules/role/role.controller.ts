@@ -71,7 +71,7 @@ class RoleController {
     permissions: ['CREATE_ROLE'],
   })
   @ApiConflictResponse({ type: ExistRoleResponseDto })
-  creteRole(@Body() body: CreateRoleDto) {
+  createRole(@Body() body: CreateRoleDto) {
     return this.roleService.create(body);
   }
 

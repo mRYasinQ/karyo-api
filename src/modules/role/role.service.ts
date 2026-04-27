@@ -1,7 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { EntityManager, type FilterQuery, wrap } from '@mikro-orm/postgresql';
 
+import type { EnvConfig } from '@/shared/schemas/env.schema';
 import { getPaginationOptions, paginate } from '@/shared/utils/pagination';
 
 import type { FindOneMethod } from '@/shared/types/service';
@@ -16,6 +18,7 @@ class RoleService {
   constructor(
     private readonly em: EntityManager,
     private readonly roleRepo: RoleRepository,
+    private readonly configService: ConfigService,
   ) {}
 
   async findAll(query: GetRolesQuery) {
@@ -54,6 +57,9 @@ class RoleService {
 
     const { name } = data;
 
+    const isDefaultRole = this.checkDefaultRole(role.name);
+    if (isDefaultRole) throw new BadRequestException(RoleMessage.DEFAULT_ROLE);
+
     const checkNameCondition = name && role.name !== name;
     const isRoleExist = checkNameCondition ? await this.checkRoleExistByName(name) : false;
     if (isRoleExist) throw new ConflictException(RoleMessage.ROLE_EXIST);
@@ -65,8 +71,14 @@ class RoleService {
   }
 
   async delete(id: number) {
-    const countRole = await this.roleRepo.nativeDelete({ id });
-    if (!countRole) throw new NotFoundException(RoleMessage.NOT_FOUND);
+    const role = await this.findOneById(id, { fields: ['id', 'name'] });
+    if (!role) throw new NotFoundException(RoleMessage.NOT_FOUND);
+
+    const isDefaultRole = this.checkDefaultRole(role.name);
+    if (isDefaultRole) throw new BadRequestException(RoleMessage.DEFAULT_ROLE);
+
+    this.em.remove(role);
+    await this.em.flush();
 
     return;
   }
@@ -79,6 +91,11 @@ class RoleService {
   async checkRoleExistById(id: number) {
     const role = await this.findOneById(id, { fields: ['id'] });
     return Boolean(role);
+  }
+
+  private checkDefaultRole(name: string) {
+    const defaultRole = this.configService.get<EnvConfig['DEFAULT_ROLE']>('app.default_role');
+    return name === defaultRole;
   }
 }
 

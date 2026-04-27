@@ -6,6 +6,7 @@ const RoleMessage = {
   ROLE_UPDATED: 'نقش بروزرسانی شد.',
   ROLE_DELETED: 'نقش حذف شد.',
   NOT_FOUND: 'نقش یافت نشد.',
+  DEFAULT_ROLE: 'نقش پیش‌فرض را نمی‌توان حذف کرد.',
   ROLE_EXIST: 'نقشی با این نام ایجاد شده است.',
 } as const;
 

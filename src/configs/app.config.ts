@@ -10,6 +10,7 @@ const AppConfig = () => {
       port: env.APP_PORT,
       storage_url: env.STORAGE_URL,
       enable_swagger: env.ENABLE_SWAGGER,
+      default_role: env.DEFAULT_ROLE,
     },
     redis: {
       url: env.REDIS_URL,

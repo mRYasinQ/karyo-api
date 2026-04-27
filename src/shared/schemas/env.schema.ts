@@ -22,6 +22,7 @@ const envSchema = z.object({
     .enum(['0', '1'])
     .default('1')
     .transform((v) => v === '1'),
+  DEFAULT_ROLE: z.string().default('مدیر'),
 
   REDIS_URL: z.url(),
   REDIS_PASSWORD: requiredStringSchema,
