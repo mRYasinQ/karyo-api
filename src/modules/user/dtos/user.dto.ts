@@ -8,8 +8,8 @@ import { baseUserSchema } from '@/shared/schemas/user.schema';
 const getUsersQuerySchema = baseQuerySchema.extend({
   search: z.string().optional(),
   role_id: z.coerce.number().optional(),
-  is_active: booleanStringSchema.optional(),
-  is_email_verified: booleanStringSchema.optional(),
+  is_active: booleanStringSchema().optional(),
+  is_email_verified: booleanStringSchema().optional(),
 });
 class GetUsersQueryDto extends createZodDto(getUsersQuerySchema) {}
 type GetUsersQuery = z.infer<typeof getUsersQuerySchema>;

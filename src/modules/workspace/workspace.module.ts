@@ -14,6 +14,7 @@ import WorkspaceService from './workspace.service';
   imports: [MikroOrmModule.forFeature([WorkspaceEntity, WorkspaceMemberEntity]), StorageModule, MailModule, UserModule],
   controllers: [WorkspaceController],
   providers: [WorkspaceService],
+  exports: [WorkspaceService],
 })
 class WorkspaceModule {}
 

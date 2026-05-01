@@ -10,14 +10,14 @@ import FileValidationPipe from '@/shared/pipes/file-validation.pipe';
 
 import StorageService from '../storage/providers/storage.service';
 import UserService from '../user/user.service';
-import { GetProfileParamDto, UpdateProfileDto } from './dto/profile.dto';
+import { GetProfileParamDto, UpdateProfileDto } from './dtos/profile.dto';
 import {
   NotFoundProfileResponseDto,
   PrivateProfileResponseDto,
   ProfileEmailExistResponseDto,
   PublicProfileResponseDto,
   UpdateProfileResponseDto,
-} from './dto/profile-response.dto';
+} from './dtos/profile-response.dto';
 import ProfileMessage from './profile.message';
 
 @Controller('profile')

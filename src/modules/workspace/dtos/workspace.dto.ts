@@ -5,17 +5,8 @@ import { WorkspaceRole } from '@/shared/constants/workspace-role';
 import baseQuerySchema from '@/shared/schemas/base-query.schema';
 import booleanStringSchema from '@/shared/schemas/boolean-string.schema';
 import fileSchema from '@/shared/schemas/file.schema';
+import slugSchema from '@/shared/schemas/slug.schema';
 import { emailSchema } from '@/shared/schemas/user.schema';
-
-const WORKSPACE_SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-const slugSchema = z
-  .string('شناسه کوتاه میزکار باید رشته باشد.')
-  .trim()
-  .toLowerCase()
-  .min(2, 'شناسه کوتاه میزکار باید حداقل ۲ کاراکتر باشد.')
-  .max(100, 'شناسه کوتاه میزکار می‌تواند حداکثر ۱۰۰ کاراکتر باشد.')
-  .regex(WORKSPACE_SLUG_REGEX, 'شناسه کوتاه میزکار باید فقط شامل حروف کوچک، اعداد و خط تیره باشد.');
 
 const baseWorkspaceSchema = z.object({
   name: z
@@ -63,7 +54,7 @@ type InviteMemberRespond = z.infer<typeof inviteMemberRespondSchema>;
 
 const getMembersWorkspaceQuerySchema = baseQuerySchema.extend({
   search: z.string().optional(),
-  is_active: booleanStringSchema.default(true),
+  is_active: booleanStringSchema().default(true),
   role: z.enum(WorkspaceRole).optional(),
 });
 class GetMembersWorkspaceQueryDto extends createZodDto(getMembersWorkspaceQuerySchema) {}
