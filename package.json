@@ -19,7 +19,7 @@
     "db:fresh": "mikro-orm migration:fresh",
     "console": "node dist/cli.js",
     "console:dev": "ts-node -r tsconfig-paths/register ./src/cli.ts",
-    "superuser:create": "pnpm console create-superuser",
+    "superuser:create": "node dist/cli.js create-superuser",
     "superuser:create:dev": "pnpm console:dev create-superuser"
   },
   "dependencies": {

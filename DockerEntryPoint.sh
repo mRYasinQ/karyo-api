@@ -1,9 +1,9 @@
 #!/bin/sh
 
 echo "Migrating database..."
-pnpm db:up
+node ./node_modules/@mikro-orm/cli/cli.js migration:up
 
 echo
 
 echo "Starting app..."
-exec pnpm start:prod
+exec node dist/main.js
