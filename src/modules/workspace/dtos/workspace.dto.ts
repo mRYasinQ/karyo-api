@@ -47,7 +47,7 @@ class InviteMemberDto extends createZodDto(inviteMemberSchema) {}
 type InviteMember = z.infer<typeof inviteMemberSchema>;
 
 const inviteMemberRespondSchema = z.object({
-  accept: z.coerce.boolean('وضعیت پذیرش دعوتنامه باید بولین باشد.'),
+  accept: booleanStringSchema('وضعیت پذیرش دعوتنامه باید بولین باشد.'),
 });
 class InviteMemberRespondDto extends createZodDto(inviteMemberRespondSchema) {}
 type InviteMemberRespond = z.infer<typeof inviteMemberRespondSchema>;
