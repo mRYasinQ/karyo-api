@@ -18,6 +18,13 @@ const envSchema = z.object({
   APP_URL: z.url().default('http://localhost:3000'),
   APP_PORT: portSchema.default(3000),
   STORAGE_URL: z.url(),
+  CORS_ORIGINS: z
+    .string()
+    .optional()
+    .transform((value) => {
+      if (value === '*') return '*';
+      return value?.split(',').map((origin) => origin.trim());
+    }),
   ENABLE_SWAGGER: z
     .enum(['0', '1'])
     .default('1')
