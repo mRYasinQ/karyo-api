@@ -17,21 +17,21 @@ import SessionRepository from './session.repository';
 class SessionService {
   constructor(
     private readonly em: EntityManager,
-    private readonly sessionRep: SessionRepository,
+    private readonly sessionRepo: SessionRepository,
   ) {}
 
   async findAllUserSession(query: GetSessionsQuery, userId: number, currentSessionId: number) {
     const { page, ...findOptions } = getPaginationOptions({ query, isOptional: true });
 
     const where: FilterQuery<SessionEntity> = { user: { $eq: userId } };
-    const [data, total] = await this.sessionRep.findAndCount(where, { ...findOptions, exclude: ['token', 'user'] });
+    const [data, total] = await this.sessionRepo.findAndCount(where, { ...findOptions, exclude: ['token', 'user'] });
     data.forEach((session) => (session.isCurrent = session.id === currentSessionId));
 
     return paginate(data, total, page, findOptions.limit);
   }
 
   async findOneUserSession(id: number, userId: number, currentSessionId: number) {
-    const session = await this.sessionRep.findOne({ id, user: userId }, { exclude: ['token', 'user'] });
+    const session = await this.sessionRepo.findOne({ id, user: userId }, { exclude: ['token', 'user'] });
     if (!session) throw new NotFoundException(SessionMessage.NOT_FOUND);
 
     session.isCurrent = session.id === currentSessionId;
@@ -40,7 +40,7 @@ class SessionService {
   }
 
   async deleteUserSession(id: number, userId: number) {
-    const deleteCount = await this.sessionRep.nativeDelete({ id, user: userId });
+    const deleteCount = await this.sessionRepo.nativeDelete({ id, user: userId });
     if (!deleteCount) throw new NotFoundException(SessionMessage.NOT_FOUND);
 
     return;
@@ -50,18 +50,18 @@ class SessionService {
     const where: FilterQuery<SessionEntity> = { user: userId };
     if (!data.include_current) where.id = { $ne: currentSessionId };
 
-    await this.sessionRep.nativeDelete(where);
+    await this.sessionRepo.nativeDelete(where);
 
     return;
   }
 
   findOneByToken: FindOneMethod<SessionEntity, FilterQuery<SessionEntity>> = (filter, options?) => {
-    return this.sessionRep.findOne(filter, options);
+    return this.sessionRepo.findOne(filter, options);
   };
 
   async create(data: CreateSession) {
     const user = this.em.getReference(UserEntity, data.userId);
-    const session = this.sessionRep.create({ ...data, user });
+    const session = this.sessionRepo.create({ ...data, user });
 
     await this.em.persist(session).flush();
 
@@ -69,11 +69,11 @@ class SessionService {
   }
 
   deleteById(id: number) {
-    return this.sessionRep.nativeDelete({ id });
+    return this.sessionRepo.nativeDelete({ id });
   }
 
   deleteByUserId(userId: number) {
-    return this.sessionRep.nativeDelete({ user: userId });
+    return this.sessionRepo.nativeDelete({ user: userId });
   }
 }
 
