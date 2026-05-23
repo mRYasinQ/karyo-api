@@ -45,7 +45,7 @@ class SuperuserCommand extends CommandRunner {
       const fork = this.em.fork();
       await RequestContext.create(fork, async () => {
         const roleId = await this.findOrCreateRole();
-        await this.userService.create({ ...answers, is_email_verified: true, is_active: true, role_id: roleId });
+        await this.userService.create({ ...validateAnswers.data, is_email_verified: true, is_active: true, role_id: roleId });
       });
 
       console.log('Superuser created successfully!');
