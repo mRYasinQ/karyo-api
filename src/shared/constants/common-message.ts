@@ -8,6 +8,7 @@ const CommonMessage = {
   INVALID_FILE_TYPE: 'فرمت فایل ارسالی معتبر نمی‌باشد.',
   INVALID_FILE_SIZE: 'حجم فایل ارسالی بیش از حد مجاز است.',
   FILE_REQUIRED: 'فایلی برای آپلود کردن انتخاب نشده، لطفا فایلی انتخاب کنید.',
+  TOO_MANY_REQUESTS: 'تعداد درخواست‌های شما بیش از حد مجاز است، لطفا :time ثانیه دیگر تلاش کنید.',
 } as const;
 
 export default CommonMessage;

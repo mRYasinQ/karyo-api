@@ -1,7 +1,8 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { LoggerModule } from 'nestjs-pino';
@@ -12,6 +13,7 @@ import BullMQConfig from '@/configs/bullmq.config';
 import DbConfig from '@/configs/db.config';
 import LoggerConifg from '@/configs/logger.config';
 import MailConfig from '@/configs/mail.config';
+import ThrottleConfig from '@/configs/throttle.config';
 
 import { MailerModule } from '@nestjs-modules/mailer';
 
@@ -33,6 +35,7 @@ import WorkspaceModule from './workspace/workspace.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [AppConfig] }),
     LoggerModule.forRootAsync(LoggerConifg),
+    ThrottlerModule.forRootAsync(ThrottleConfig),
     MikroOrmModule.forRootAsync(DbConfig),
     BullModule.forRootAsync(BullMQConfig),
     MailerModule.forRootAsync(MailConfig),
@@ -51,6 +54,10 @@ import WorkspaceModule from './workspace/workspace.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformResponse,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
     {
       provide: APP_PIPE,

@@ -55,6 +55,9 @@ const envSchema = z.object({
   OTP_EXPIRE: msFormatSchema('3m'),
   OTP_CACHE: msFormatSchema('1d'),
   SESSION_EXPIRE: msFormatSchema('15d'),
+
+  THROTTLE_TTL: msFormatSchema('60m'),
+  THROTTLE_LIMIT: z.coerce.number().default(100),
 });
 
 type EnvConfig = z.infer<typeof envSchema>;

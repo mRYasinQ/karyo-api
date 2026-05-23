@@ -47,6 +47,10 @@ const AppConfig = () => {
         expire: env.SESSION_EXPIRE,
       },
     },
+    throttle: {
+      ttl: env.THROTTLE_TTL,
+      limit: env.THROTTLE_LIMIT,
+    },
   };
 };
 
