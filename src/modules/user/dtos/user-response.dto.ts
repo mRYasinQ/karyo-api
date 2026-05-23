@@ -43,11 +43,11 @@ class UserAdminData extends BaseResponseDto {
   avatar: string;
 
   @Expose()
-  @ApiProperty({ name: 'is_active', nullable: true })
+  @ApiProperty({ name: 'is_active' })
   isActive: boolean;
 
   @Expose()
-  @ApiProperty({ name: 'is_email_verified', nullable: true })
+  @ApiProperty({ name: 'is_email_verified' })
   isEmailVerified: boolean;
 
   @Expose()

@@ -34,23 +34,20 @@ class WorkspaceMemberData {
   @FlattenUser('id')
   id: number;
 
-  @FlattenUser('createdAt', { name: 'created_at', format: 'date-time' })
-  createdAt: string;
-
-  @FlattenUser('firstName', { name: 'first_name' })
+  @FlattenUser('firstName', { name: 'first_name', nullable: true })
   firstName: string;
 
-  @FlattenUser('lastName', { name: 'last_name' })
+  @FlattenUser('lastName', { name: 'last_name', nullable: true })
   lastName: string;
 
   @FlattenUser('username')
   username: string;
 
-  @FlattenUser('avatar')
+  @FlattenUser('avatar', { nullable: true })
   @ToStorageUrl()
   avatar: string;
 
-  @FlattenUser('birthday', { format: 'date' })
+  @FlattenUser('birthday', { format: 'date', nullable: true })
   birthday: string;
 
   @Expose({ name: 'role' })

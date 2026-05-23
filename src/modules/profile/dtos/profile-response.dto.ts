@@ -20,7 +20,7 @@ class PrivateProfileRoleData extends BaseResponseDto {
   permissions: Permission[];
 }
 
-class PublicProfileRoleData extends PickType(BaseResponseDto, ['id', 'createdAt']) {
+class PublicProfileRoleData extends PickType(BaseResponseDto, ['id']) {
   @Expose()
   @ApiProperty()
   name: string;
@@ -49,11 +49,11 @@ class PrivateProfileData extends BaseResponseDto {
   avatar: string;
 
   @Expose()
-  @ApiProperty({ name: 'is_active', nullable: true })
+  @ApiProperty({ name: 'is_active' })
   isActive: boolean;
 
   @Expose()
-  @ApiProperty({ name: 'is_email_verified', nullable: true })
+  @ApiProperty({ name: 'is_email_verified' })
   isEmailVerified: boolean;
 
   @Expose()
@@ -65,7 +65,7 @@ class PrivateProfileData extends BaseResponseDto {
   birthday: Date;
 }
 
-class PublicProfileData extends PickType(BaseResponseDto, ['id', 'createdAt']) {
+class PublicProfileData extends PickType(BaseResponseDto, ['id']) {
   @Expose()
   @ApiProperty({ name: 'first_name', nullable: true })
   firstName: string;
