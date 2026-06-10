@@ -11,7 +11,30 @@ import { createBaseResponse, createDataResponse, createErrorResponse, createPagi
 import FlattenUser from '../decorators/flatten-user.decorator';
 import WorkspaceMessage from '../workspace.message';
 
-class WorkspaceData extends BaseResponseDto {
+class PrivateWorkspaceData extends BaseResponseDto {
+  @Expose()
+  @ApiProperty()
+  name: string;
+
+  @Expose()
+  @ApiProperty()
+  slug: string;
+
+  @Expose()
+  @ApiProperty({ nullable: true })
+  @ToStorageUrl()
+  logo: string;
+
+  @Expose({ name: 'role' })
+  @ApiProperty({ name: 'workspace_role', enum: WorkspaceRole, nullable: true })
+  workspaceRole: WorkspaceRole;
+
+  @Expose()
+  @ApiProperty({ nullable: true })
+  description: string;
+}
+
+class PublicWorkspaceData extends BaseResponseDto {
   @Expose()
   @ApiProperty()
   name: string;
@@ -76,9 +99,9 @@ class CreateWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WOR
 class UpdateWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_UPDATED) {}
 class DeleteWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_DELETED) {}
 
-class GetWorkspacesResponseDto extends createPaginatedResponse(WorkspaceData, WorkspaceMessage.WORKSPACES_GET) {}
-class GetInvitationsResponseDto extends createPaginatedResponse(WorkspaceData, WorkspaceMessage.INVITATIONS_GET) {}
-class GetWorkspaceResponseDto extends createDataResponse(WorkspaceData, WorkspaceMessage.WORKSPACE_GET) {}
+class GetWorkspacesResponseDto extends createPaginatedResponse(PrivateWorkspaceData, WorkspaceMessage.WORKSPACES_GET) {}
+class GetInvitationsResponseDto extends createPaginatedResponse(PublicWorkspaceData, WorkspaceMessage.INVITATIONS_GET) {}
+class GetWorkspaceResponseDto extends createDataResponse(PrivateWorkspaceData, WorkspaceMessage.WORKSPACE_GET) {}
 class InviteMemberResponseDto extends createBaseResponse(WorkspaceMessage.INVITE_SENT) {}
 class InviteMemberRespondResponseDto extends createBaseResponse(WorkspaceMessage.INVITE_RESPONSE_SENT) {}
 

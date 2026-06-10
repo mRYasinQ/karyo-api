@@ -70,10 +70,23 @@ class WorkspaceService {
 
     if (search) where.name = { $ilike: `%${search}%` };
 
-    const [data, total] = await this.workspaceRepo.findAndCount(where, {
+    const [workspaces, total] = await this.workspaceRepo.findAndCount(where, {
       ...findOptions,
-      exclude: ['members'],
+      populate: ['members'],
+      populateWhere: {
+        members: { user: userId, isActive: true },
+      },
       strategy: LoadStrategy.JOINED,
+    });
+
+    const data = workspaces.map((workspace) => {
+      const member = workspace.members[0];
+      const workspacePlain = wrap(workspace).toObject();
+
+      return {
+        ...workspacePlain,
+        role: member?.role,
+      };
     });
 
     return paginate(data, total, page, findOptions.limit);
@@ -88,6 +101,17 @@ class WorkspaceService {
     );
 
     return paginate(data, total, page, findOptions.limit);
+  }
+
+  async getWorkspaceWithRole(slug: string, userId: number) {
+    const workspace = await this.workspaceRepo.findOne({ slug, members: { user: userId, isActive: true } }, { exclude: ['members'] });
+    if (!workspace) throw new NotFoundException(CommonMessage.WORKSPACE_NOT_FOUND);
+
+    const member = await this.memberRepo.findOne({ workspace: workspace.id, user: userId }, { fields: ['role'] });
+
+    const workspacePlain = wrap(workspace).toObject();
+
+    return { ...workspacePlain, role: member?.role };
   }
 
   async findMembersOfWorkspace(workspaceId: number, query: GetMembersWorkspaceQuery) {

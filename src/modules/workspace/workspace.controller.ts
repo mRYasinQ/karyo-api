@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   HttpStatus,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -17,7 +16,6 @@ import { ApiBadRequestResponse, ApiConflictResponse, ApiNotFoundResponse } from 
 
 import type { Request } from 'express';
 
-import CommonMessage from '@/shared/constants/common-message';
 import STORAGE_FOLDERS from '@/shared/constants/storage-folders';
 import { WorkspaceRole, WorkspaceRoleLabels } from '@/shared/constants/workspace-role';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
@@ -114,13 +112,12 @@ class WorkspaceController {
     successMessage: WorkspaceMessage.WORKSPACE_GET,
     summary: 'Get workspace',
     type: GetWorkspaceResponseDto,
+    secure: 'required',
   })
+  @SetWorkspacePolicy({ requireActive: true })
   @ApiNotFoundResponse({ type: NotFoundWorkspaceResponseDto })
-  async getWorkspace(@Param('slug') slug: string) {
-    const workspace = await this.workspaceService.findOne({ slug }, { exclude: ['members'] });
-    if (!workspace) throw new NotFoundException(CommonMessage.WORKSPACE_NOT_FOUND);
-
-    return workspace;
+  getWorkspace(@Param('slug') slug: string, @CurrentUserId() userId: number) {
+    return this.workspaceService.getWorkspaceWithRole(slug, userId);
   }
 
   @Post('/:slug/invitations')
