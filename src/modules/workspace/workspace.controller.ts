@@ -19,7 +19,7 @@ import type { Request } from 'express';
 
 import CommonMessage from '@/shared/constants/common-message';
 import STORAGE_FOLDERS from '@/shared/constants/storage-folders';
-import { WorkspaceRole } from '@/shared/constants/workspace-role';
+import { WorkspaceRole, WorkspaceRoleLabels } from '@/shared/constants/workspace-role';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
 import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
 import CurrentWorkspace from '@/shared/decorators/current-workspace.decorator';
@@ -47,6 +47,7 @@ import {
   GetInvitationsResponseDto,
   GetMembersWorkspaceResponseDto,
   GetWorkspaceResponseDto,
+  GetWorkspaceRolesResponseDto,
   GetWorkspacesResponseDto,
   InviteMemberRespondResponseDto,
   InviteMemberResponseDto,
@@ -88,6 +89,23 @@ class WorkspaceController {
   })
   getInvitations(@Query() query: GetInvitationsQueryDto, @CurrentUserId() userId: number) {
     return this.workspaceService.getInvitations(userId, query);
+  }
+
+  @Get('/roles')
+  @ApiStandard({
+    status: HttpStatus.OK,
+    successMessage: WorkspaceMessage.ROLES_GET,
+    summary: 'Get workspace roles',
+    type: GetWorkspaceRolesResponseDto,
+    secure: 'required',
+  })
+  getRoles() {
+    const roles = Object.values(WorkspaceRole).map((role) => ({
+      name: WorkspaceRoleLabels[role],
+      value: role,
+    }));
+
+    return [roles, {}];
   }
 
   @Get('/:slug')

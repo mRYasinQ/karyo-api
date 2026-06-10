@@ -6,6 +6,7 @@ const WorkspaceMessage = {
   WORKSPACE_DELETED: 'میزکار حذف شد.',
 
   MEMBERS_GET: 'اعضای میزکار دریافت شدند.',
+  ROLES_GET: 'لیست نقش‌های میزکار دریافت شدند.',
   MEMBER_REMOVED: 'عضو از میزکار حذف شد.',
   MEMBER_ROLE_UPDATED: 'نقش عضو بروزرسانی شد.',
   MEMBER_LEAVED: 'شما میزکار را ترک کردید.',

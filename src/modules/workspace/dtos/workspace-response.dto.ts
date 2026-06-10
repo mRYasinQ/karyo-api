@@ -62,6 +62,16 @@ class WorkspaceMemberData {
   user: unknown;
 }
 
+class WorkspaceRoleData {
+  @Expose()
+  @ApiProperty()
+  name: string;
+
+  @Expose()
+  @ApiProperty({ enum: WorkspaceRole })
+  value: WorkspaceRole;
+}
+
 class CreateWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_CREATED, HttpStatus.CREATED) {}
 class UpdateWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_UPDATED) {}
 class DeleteWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.WORKSPACE_DELETED) {}
@@ -73,6 +83,7 @@ class InviteMemberResponseDto extends createBaseResponse(WorkspaceMessage.INVITE
 class InviteMemberRespondResponseDto extends createBaseResponse(WorkspaceMessage.INVITE_RESPONSE_SENT) {}
 
 class GetMembersWorkspaceResponseDto extends createPaginatedResponse(WorkspaceMemberData, WorkspaceMessage.MEMBERS_GET) {}
+class GetWorkspaceRolesResponseDto extends createDataResponse(WorkspaceRoleData, WorkspaceMessage.ROLES_GET, HttpStatus.OK, true) {}
 class UpdateRoleMemberResponseDto extends createBaseResponse(WorkspaceMessage.MEMBER_ROLE_UPDATED) {}
 class RemoveMemberResponseDto extends createBaseResponse(WorkspaceMessage.MEMBER_REMOVED) {}
 class LeaveWorkspaceResponseDto extends createBaseResponse(WorkspaceMessage.MEMBER_LEAVED) {}
@@ -90,6 +101,7 @@ export {
   InviteMemberResponseDto,
   InviteMemberRespondResponseDto,
   GetMembersWorkspaceResponseDto,
+  GetWorkspaceRolesResponseDto,
   UpdateRoleMemberResponseDto,
   RemoveMemberResponseDto,
   LeaveWorkspaceResponseDto,
