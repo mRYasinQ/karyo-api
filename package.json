@@ -1,6 +1,6 @@
 {
   "name": "karyo-api",
-  "version": "0.0.1",
+  "version": "0.8.0",
   "description": "Intelligent workspace management designed to organize tasks, track progress, and boost team productivity.",
   "author": "Yasin Abbasi",
   "private": true,

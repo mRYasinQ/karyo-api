@@ -3,13 +3,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 
+const DOCUMENT_TITLE = 'Karyo API';
+
 const setupSwagger = (app: INestApplication, appUrl: string) => {
   const swaggerConfig = new DocumentBuilder()
     .setOpenAPIVersion('3.0.1')
-    .setTitle('Karyo API')
+    .setTitle(DOCUMENT_TITLE)
     .setDescription('Intelligent workspace management designed to organize tasks, track progress, and boost team productivity.')
     .setContact('Yasin Abbasi', 'https://mryasinq.ir', 'yasinabbasi.y20@gmail.com')
-    .setVersion('0.0.1')
+    .setVersion('0.8.0')
     .addServer(appUrl, 'Stage/Production Server')
     .addBearerAuth({ type: 'http', scheme: 'bearer', in: 'header' })
     .build();
@@ -17,7 +19,7 @@ const setupSwagger = (app: INestApplication, appUrl: string) => {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   SwaggerModule.setup('docs', app, cleanupOpenApiDoc(document), {
-    customSiteTitle: 'Karyo API | Documentation',
+    customSiteTitle: `${DOCUMENT_TITLE} | Documentation`,
     swaggerOptions: {
       persistAuthorization: true,
     },
