@@ -7,7 +7,7 @@ import RoleService from '@/modules/role/role.service';
 
 import { PERMISSION_LIST } from '@/shared/constants/permission';
 import { EnvConfig } from '@/shared/schemas/env.schema';
-import { baseUserSchema } from '@/shared/schemas/user.schema';
+import baseUserSchema from '@/shared/schemas/user.schema';
 
 import UserService from '../../user/user.service';
 import type { SuperuserData } from '../interfaces/superuser.interface';

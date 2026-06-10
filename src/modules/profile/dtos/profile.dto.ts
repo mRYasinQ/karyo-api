@@ -1,7 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
-import { baseUserSchema, usernameSchema } from '@/shared/schemas/user.schema';
+import baseUserSchema, { usernameSchema } from '@/shared/schemas/user.schema';
 
 const getProfileParamSchema = z.object({
   username: usernameSchema,

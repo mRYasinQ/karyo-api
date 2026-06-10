@@ -35,4 +35,5 @@ const baseUserSchema = z.object({
   avatar: fileSchema.nullable().optional(),
 });
 
-export { usernameSchema, emailSchema, passwordSchema, baseUserSchema };
+export { usernameSchema, emailSchema, passwordSchema };
+export default baseUserSchema;

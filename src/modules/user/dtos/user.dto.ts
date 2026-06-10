@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import baseQuerySchema from '@/shared/schemas/base-query.schema';
 import booleanStringSchema from '@/shared/schemas/boolean-string.schema';
-import { baseUserSchema } from '@/shared/schemas/user.schema';
+import baseUserSchema from '@/shared/schemas/user.schema';
 
 const getUsersQuerySchema = baseQuerySchema.extend({
   search: z.string().optional(),
