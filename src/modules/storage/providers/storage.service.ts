@@ -1,18 +1,23 @@
 import path from 'node:path';
 
+import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import aws4 from 'aws4';
+import { Queue } from 'bullmq';
 import ms, { type StringValue } from 'ms';
 import sharp from 'sharp';
 
 import getStorageConfig from '@/configs/storage.config';
 
+import QUEUES from '@/shared/constants/queues';
 import type { EnvConfig } from '@/shared/schemas/env.schema';
 import { generateRandomBytes, md5 } from '@/shared/utils/random';
+
+import { STORAGE_JOBS } from '../storage.constant';
 
 @Injectable()
 class StorageService implements OnModuleInit {
@@ -21,7 +26,10 @@ class StorageService implements OnModuleInit {
   private client: S3Client;
   private bucket: string;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    private readonly config: ConfigService,
+    @InjectQueue(QUEUES.STORAGE) private readonly storageQueue: Queue,
+  ) {
     this.bucket = config.getOrThrow<EnvConfig['MINIO_BUCKET']>('minio.bucket');
   }
 
@@ -74,7 +82,11 @@ class StorageService implements OnModuleInit {
     return Promise.all(files.map((file) => this.uploadFile(file, folder)));
   }
 
-  async deleteFile(fileKey: string) {
+  deleteFile(fileKey: string) {
+    return this.storageQueue.add(STORAGE_JOBS.DELETE_FILE, fileKey);
+  }
+
+  async executeS3Deletion(fileKey: string) {
     const command = new DeleteObjectCommand({ Bucket: this.bucket, Key: fileKey });
     const result = await this.client.send(command);
 

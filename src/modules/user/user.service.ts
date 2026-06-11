@@ -13,7 +13,7 @@ import PasswordProvider from '../common/providers/password.provider';
 import RoleEntity from '../role/role.entity';
 import RoleService from '../role/role.service';
 import SessionService from '../session/session.service';
-import StorageProducer from '../storage/providers/storage.producer';
+import StorageService from '../storage/providers/storage.service';
 import type { CreateUser, GetUsersQuery, UpdateUser } from './dtos/user.dto';
 import UserEntity from './user.entity';
 import UserMessage from './user.message';
@@ -25,7 +25,7 @@ class UserService {
     private readonly em: EntityManager,
     private readonly userRepo: UserRepository,
     private readonly passwordProvider: PasswordProvider,
-    private readonly storageProducer: StorageProducer,
+    private readonly storageService: StorageService,
     private readonly roleService: RoleService,
     private readonly sessionService: SessionService,
   ) {}
@@ -108,7 +108,7 @@ class UserService {
     wrap(user).assign(newUserData);
     await this.em.flush();
 
-    if (userAvatar && (avatar || avatar === null)) await this.storageProducer.deleteFile({ fileKey: userAvatar });
+    if (userAvatar && (avatar || avatar === null)) await this.storageService.deleteFile(userAvatar);
     if (userStatus && isActive === false) await this.sessionService.deleteByUserId(id);
 
     return;
@@ -122,7 +122,7 @@ class UserService {
     await this.em.flush();
 
     const userAvatar = user.avatar;
-    if (userAvatar) await this.storageProducer.deleteFile({ fileKey: userAvatar });
+    if (userAvatar) await this.storageService.deleteFile(userAvatar);
 
     return;
   }

@@ -4,11 +4,11 @@ import { Injectable } from '@nestjs/common';
 import type { Request } from 'express';
 import { catchError, Observable, throwError } from 'rxjs';
 
-import StorageProducer from '../providers/storage.producer';
+import StorageService from '../providers/storage.service';
 
 @Injectable()
 class UploadCleanup implements NestInterceptor {
-  constructor(private readonly storageProducer: StorageProducer) {}
+  constructor(private readonly storageService: StorageService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
@@ -19,7 +19,7 @@ class UploadCleanup implements NestInterceptor {
         const key = req.uploadedFileKey;
         if (key) {
           const keysToDelete = Array.isArray(key) ? key : [key];
-          void Promise.all(keysToDelete.map((key) => this.storageProducer.deleteFile({ fileKey: key })));
+          void Promise.all(keysToDelete.map((key) => this.storageService.deleteFile(key)));
         }
 
         return throwError(() => err);

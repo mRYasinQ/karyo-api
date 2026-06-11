@@ -2,14 +2,11 @@ interface MailData {
   mail: string;
   title: string;
   message: string;
-}
-
-interface SendMailOptions extends MailData {
-  jobName?: string;
+  type?: string;
 }
 
 interface MailProcessResult {
   success: boolean;
 }
 
-export type { MailData, SendMailOptions, MailProcessResult };
+export type { MailData, MailProcessResult };

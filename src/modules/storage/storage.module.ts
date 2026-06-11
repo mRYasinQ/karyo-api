@@ -4,7 +4,6 @@ import { Module } from '@nestjs/common';
 import QUEUES from '@/shared/constants/queues';
 
 import StorageConsumer from './providers/storage.consumer';
-import StorageProducer from './providers/storage.producer';
 import StorageService from './providers/storage.service';
 
 @Module({
@@ -13,8 +12,8 @@ import StorageService from './providers/storage.service';
       name: QUEUES.STORAGE,
     }),
   ],
-  providers: [StorageService, StorageConsumer, StorageProducer],
-  exports: [StorageService, StorageProducer],
+  providers: [StorageService, StorageConsumer],
+  exports: [StorageService],
 })
 class StorageModule {}
 

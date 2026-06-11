@@ -70,10 +70,10 @@ class AuthService {
 
     const user = await this.userService.create({ email, password, is_email_verified: true });
     await this.mailService.sendMail({
-      jobName: 'welcome_mail',
       mail: email,
       title: 'به کاریو خوش آمدید.',
       message: 'کاربر عزیز ثبت‌نام شما با موفقیت انجام شد.',
+      type: 'welcome',
     });
 
     const token = await this.createToken(user.id, agent);
@@ -102,10 +102,10 @@ class AuthService {
 
     await this.redisService.set(key, value, this.otpExpire);
     await this.mailService.sendMail({
-      jobName: 'register_code_mail',
       mail: email,
       title: 'کد تایید ایمیل',
       message: `کد تایید ایمیل شما: ${otp}`,
+      type: 'register-user',
     });
 
     return { email };
@@ -175,10 +175,10 @@ class AuthService {
 
     await this.redisService.set(key, value, this.otpExpire);
     await this.mailService.sendMail({
-      jobName: 'recover_password_mail',
       mail: email,
       title: 'کد بازیابی گذرواژه',
       message: `کد بازیابی شما: ${otp}`,
+      type: 'recover-password',
     });
 
     return { email };
@@ -223,10 +223,10 @@ class AuthService {
 
     await this.redisService.set(key, otp, this.otpExpire);
     await this.mailService.sendMail({
-      jobName: 'verify_email_mail',
       mail: email,
       title: 'کد تایید ایمیل',
       message: `کد تایید ایمیل شما: ${otp}`,
+      type: 'verify-email',
     });
 
     return { email };

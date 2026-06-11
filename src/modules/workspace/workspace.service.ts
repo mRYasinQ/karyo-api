@@ -9,7 +9,7 @@ import { getPaginationOptions, paginate } from '@/shared/utils/pagination';
 import type { FindOneMethod } from '@/shared/types/service';
 
 import MailService from '../mail/providers/mail.service';
-import StorageProducer from '../storage/providers/storage.producer';
+import StorageService from '../storage/providers/storage.service';
 import UserEntity from '../user/user.entity';
 import UserService from '../user/user.service';
 import type {
@@ -35,7 +35,7 @@ class WorkspaceService {
     private readonly em: EntityManager,
     private readonly workspaceRepo: WorkspaceRepository,
     private readonly memberRepo: WorkspaceMemberRepository,
-    private readonly storageProducer: StorageProducer,
+    private readonly storageService: StorageService,
     private readonly mailService: MailService,
     private readonly userService: UserService,
   ) {}
@@ -159,10 +159,10 @@ class WorkspaceService {
     await this.em.flush();
 
     await this.mailService.sendMail({
-      jobName: 'invite_member',
       mail: user.email,
       title: 'دعوتنامه در میزکار جدید',
       message: `${userFirstName} عزیز، دعوتنامه جدیدی برای شما ارسال شده است.`,
+      type: 'invite-member',
     });
 
     return;
@@ -262,7 +262,7 @@ class WorkspaceService {
     wrap(workspace).assign(data);
     await this.em.flush();
 
-    if (workspaceLogo && (logo || logo === null)) await this.storageProducer.deleteFile({ fileKey: workspaceLogo });
+    if (workspaceLogo && (logo || logo === null)) await this.storageService.deleteFile(workspaceLogo);
 
     return;
   }
@@ -275,7 +275,7 @@ class WorkspaceService {
     await this.em.flush();
 
     const workspaceLogo = workspace.logo;
-    if (workspaceLogo) await this.storageProducer.deleteFile({ fileKey: workspaceLogo });
+    if (workspaceLogo) await this.storageService.deleteFile(workspaceLogo);
 
     return;
   }
