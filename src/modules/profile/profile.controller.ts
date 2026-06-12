@@ -5,7 +5,7 @@ import type { Request } from 'express';
 
 import STORAGE_FOLDERS from '@/shared/constants/storage-folders';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
-import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
+import CurrentUser from '@/shared/decorators/current-user.decorator';
 import FileValidationPipe from '@/shared/pipes/file-validation.pipe';
 
 import StorageService from '../storage/providers/storage.service';
@@ -35,7 +35,7 @@ class ProfileController {
     type: PrivateProfileResponseDto,
     secure: 'required',
   })
-  getProfile(@CurrentUserId() userId: number) {
+  getProfile(@CurrentUser('id') userId: number) {
     return this.userService.findOneById(userId, { populate: ['role.*'] });
   }
 
@@ -83,7 +83,7 @@ class ProfileController {
   async updateProfile(
     @Req() req: Request,
     @Body() body: UpdateProfileDto,
-    @CurrentUserId() userId: number,
+    @CurrentUser('id') userId: number,
     @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] }))
     file?: Express.Multer.File,
   ) {

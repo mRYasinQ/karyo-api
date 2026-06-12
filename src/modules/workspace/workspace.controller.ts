@@ -19,7 +19,7 @@ import type { Request } from 'express';
 import STORAGE_FOLDERS from '@/shared/constants/storage-folders';
 import { WorkspaceRole, WorkspaceRoleLabels } from '@/shared/constants/workspace-role';
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
-import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
+import CurrentUser from '@/shared/decorators/current-user.decorator';
 import CurrentWorkspace from '@/shared/decorators/current-workspace.decorator';
 import SetWorkspacePolicy from '@/shared/decorators/workspace-policy.decorator';
 import { NotFoundWorkspaceResponseDto } from '@/shared/dtos/workspace-response.dto';
@@ -73,7 +73,7 @@ class WorkspaceController {
     type: GetWorkspacesResponseDto,
     secure: 'required',
   })
-  getWorkspaces(@Query() query: GetWorkspacesQueryDto, @CurrentUserId() userId: number) {
+  getWorkspaces(@Query() query: GetWorkspacesQueryDto, @CurrentUser('id') userId: number) {
     return this.workspaceService.getActiveWorkspaces(userId, query);
   }
 
@@ -85,7 +85,7 @@ class WorkspaceController {
     type: GetInvitationsResponseDto,
     secure: 'required',
   })
-  getInvitations(@Query() query: GetInvitationsQueryDto, @CurrentUserId() userId: number) {
+  getInvitations(@Query() query: GetInvitationsQueryDto, @CurrentUser('id') userId: number) {
     return this.workspaceService.getInvitations(userId, query);
   }
 
@@ -116,7 +116,7 @@ class WorkspaceController {
   })
   @SetWorkspacePolicy({ requireActive: true })
   @ApiNotFoundResponse({ type: NotFoundWorkspaceResponseDto })
-  getWorkspace(@Param('slug') slug: string, @CurrentUserId() userId: number) {
+  getWorkspace(@Param('slug') slug: string, @CurrentUser('id') userId: number) {
     return this.workspaceService.getWorkspaceWithRole(slug, userId);
   }
 
@@ -147,7 +147,7 @@ class WorkspaceController {
   respondToInvitation(
     @Param('slug') _slug: string,
     @Body() body: InviteMemberRespondDto,
-    @CurrentUserId() userId: number,
+    @CurrentUser('id') userId: number,
     @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
   ) {
     return this.workspaceService.respondToInvitation(currentWorkspace.id, userId, body);
@@ -201,7 +201,7 @@ class WorkspaceController {
     @Param('slug') _slug: string,
     @Param('memberId') memberId: number,
     @CurrentWorkspace() currentWorkspace: ActiveWorkspace,
-    @CurrentUserId() userId: number,
+    @CurrentUser('id') userId: number,
   ) {
     if (memberId === userId) throw new BadRequestException(WorkspaceMessage.CANNOT_REMOVE_SELF);
     return this.workspaceService.removeMember(currentWorkspace.id, memberId, currentWorkspace.role as WorkspaceRole);
@@ -216,7 +216,7 @@ class WorkspaceController {
     secure: 'required',
   })
   @SetWorkspacePolicy({ requireActive: true })
-  leaveWorkspace(@Param('slug') _slug: string, @CurrentWorkspace() currentWorkspace: ActiveWorkspace, @CurrentUserId() userId: number) {
+  leaveWorkspace(@Param('slug') _slug: string, @CurrentWorkspace() currentWorkspace: ActiveWorkspace, @CurrentUser('id') userId: number) {
     return this.workspaceService.leaveMember(currentWorkspace.id, userId);
   }
 
@@ -234,7 +234,7 @@ class WorkspaceController {
   async createWorkspace(
     @Req() req: Request,
     @Body() body: CreateWorkspaceDto,
-    @CurrentUserId() userId: number,
+    @CurrentUser('id') userId: number,
     @UploadedFile(new FileValidationPipe({ allowedTypes: ['image/png', 'image/jpeg', 'image/webp'] })) file?: Express.Multer.File,
   ) {
     if (file) {

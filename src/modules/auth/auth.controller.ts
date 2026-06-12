@@ -2,8 +2,7 @@ import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { ApiTags, ApiTooManyRequestsResponse } from '@nestjs/swagger';
 
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
-import CurrentSession from '@/shared/decorators/current-session.decorator';
-import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
+import CurrentUser from '@/shared/decorators/current-user.decorator';
 import UserAgent, { type UserAgentResult } from '@/shared/decorators/user-agent.decorator';
 
 import type { Session } from '@/shared/types/global';
@@ -115,7 +114,7 @@ class AuthController {
     secure: 'required',
   })
   @ApiTooManyRequestsResponse({ type: TooManyRequestOtpResponseDto })
-  sendVerifyEmailOtp(@CurrentUserId() userId: number) {
+  sendVerifyEmailOtp(@CurrentUser('id') userId: number) {
     return this.authService.sendVerifyEmailOtp(userId);
   }
 
@@ -127,7 +126,7 @@ class AuthController {
     type: VerifyEmailOtpResponseDto,
     secure: 'required',
   })
-  verifyEmail(@Body() body: VerifyEmailOtpDto, @CurrentUserId() userId: number) {
+  verifyEmail(@Body() body: VerifyEmailOtpDto, @CurrentUser('id') userId: number) {
     return this.authService.verifyEmail(userId, body);
   }
 
@@ -139,7 +138,7 @@ class AuthController {
     type: LogoutResponseDto,
     secure: 'required',
   })
-  logout(@CurrentSession() currentSession: Session) {
+  logout(@CurrentUser('session') currentSession: Session) {
     return this.authService.logout(currentSession.id);
   }
 }

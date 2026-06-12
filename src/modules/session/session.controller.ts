@@ -2,8 +2,7 @@ import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Param, 
 import { ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 import ApiStandard from '@/shared/decorators/api-standard.decorator';
-import CurrentSession from '@/shared/decorators/current-session.decorator';
-import CurrentUserId from '@/shared/decorators/current-user-id.decorator';
+import CurrentUser from '@/shared/decorators/current-user.decorator';
 
 import type { Session } from '@/shared/types/global';
 
@@ -31,7 +30,7 @@ class SessionController {
     type: GetSessionsResponseDto,
     secure: 'required',
   })
-  getSessions(@Query() query: GetSessionsQueryDto, @CurrentUserId() userId: number, @CurrentSession() currentSession: Session) {
+  getSessions(@Query() query: GetSessionsQueryDto, @CurrentUser('id') userId: number, @CurrentUser('session') currentSession: Session) {
     return this.sessionService.findAllUserSession(query, userId, currentSession.id);
   }
 
@@ -44,7 +43,7 @@ class SessionController {
     secure: 'required',
   })
   @ApiNotFoundResponse({ type: NotFoundSessionResponseDto })
-  getSession(@Param('id', ParseIntPipe) id: number, @CurrentUserId() userId: number, @CurrentSession() currentSession: Session) {
+  getSession(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number, @CurrentUser('session') currentSession: Session) {
     return this.sessionService.findOneUserSession(id, userId, currentSession.id);
   }
 
@@ -58,7 +57,7 @@ class SessionController {
     secure: 'required',
   })
   @ApiBadRequestResponse({ type: DeleteCurrentSessionResponseDto })
-  deleteSession(@Param('id', ParseIntPipe) id: number, @CurrentUserId() userId: number, @CurrentSession() currentSession: Session) {
+  deleteSession(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number, @CurrentUser('session') currentSession: Session) {
     if (id === currentSession.id) throw new BadRequestException(SessionMessage.CANNOT_DELETE_CURRENT_SESSION);
     return this.sessionService.deleteUserSession(id, userId);
   }
@@ -71,7 +70,7 @@ class SessionController {
     type: ClearSessionResponseDto,
     secure: 'required',
   })
-  clearSessions(@Body() body: ClearSessionsDto, @CurrentUserId() userId: number, @CurrentSession() currentSession: Session) {
+  clearSessions(@Body() body: ClearSessionsDto, @CurrentUser('id') userId: number, @CurrentUser('session') currentSession: Session) {
     return this.sessionService.clearUserSessions(userId, currentSession.id, body);
   }
 }
