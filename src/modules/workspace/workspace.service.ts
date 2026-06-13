@@ -121,16 +121,7 @@ class WorkspaceService {
     const [data, total] = await this.memberRepo.findAndCount(where, {
       ...findOptions,
       populate: ['user'],
-      exclude: [
-        'isActive',
-        'workspace',
-        'user.password',
-        'user.isActive',
-        'user.isEmailVerified',
-        'user.role',
-        'user.email',
-        'user.updatedAt',
-      ],
+      exclude: ['workspace', 'user.password', 'user.isActive', 'user.isEmailVerified', 'user.role', 'user.email', 'user.updatedAt'],
       strategy: LoadStrategy.JOINED,
     });
 
@@ -297,7 +288,6 @@ class WorkspaceService {
 
     const where: FilterQuery<WorkspaceMemberEntity> = {
       workspace: { id: workspaceId },
-      isActive: is_active,
     };
 
     if (search) {
@@ -310,6 +300,7 @@ class WorkspaceService {
         ],
       };
     }
+    if (is_active !== undefined) where.isActive = is_active;
     if (role) where.role = role;
 
     return where;

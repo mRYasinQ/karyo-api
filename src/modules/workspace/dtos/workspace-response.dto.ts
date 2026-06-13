@@ -78,6 +78,10 @@ class WorkspaceMemberData {
   workspaceRole: WorkspaceRole;
 
   @Expose()
+  @ApiProperty({ name: 'is_active' })
+  isActive: boolean;
+
+  @Expose()
   @ApiProperty({ name: 'joined_at', format: 'date-time' })
   joinedAt: Date;
 

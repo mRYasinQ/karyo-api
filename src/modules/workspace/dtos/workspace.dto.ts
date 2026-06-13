@@ -54,7 +54,7 @@ type InviteMemberRespond = z.infer<typeof inviteMemberRespondSchema>;
 
 const getMembersWorkspaceQuerySchema = baseQuerySchema.extend({
   search: z.string().optional(),
-  is_active: booleanStringSchema().default(true),
+  is_active: booleanStringSchema().optional(),
   role: z.enum(WorkspaceRole).optional(),
 });
 class GetMembersWorkspaceQueryDto extends createZodDto(getMembersWorkspaceQuerySchema) {}
