@@ -276,6 +276,13 @@ class WorkspaceService {
     return Boolean(workspace);
   }
 
+  async checkIsUserWorkspaceMember(workspaceId: number, userId: number) {
+    const member = await this.findMemberOfWorkspace({ memberId: userId, identity: workspaceId }, { fields: ['isActive'] });
+    if (!member || (member && !member.isActive)) return false;
+
+    return true;
+  }
+
   private async getValidateWorkspaceMember(workspaceId: number, userId: number) {
     const member = await this.findMemberOfWorkspace({ memberId: userId, identity: workspaceId }, { fields: ['isActive', 'role'] });
     if (!member || (member && !member.isActive)) throw new NotFoundException(WorkspaceMessage.MEMBER_NOT_FOUND);

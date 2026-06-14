@@ -11,6 +11,7 @@ import ProjectService from './project.service';
   imports: [MikroOrmModule.forFeature([ProjectEntity]), WorkspaceModule],
   controllers: [ProjectController],
   providers: [ProjectService],
+  exports: [ProjectService],
 })
 class ProjectModule {}
 

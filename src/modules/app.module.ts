@@ -28,6 +28,7 @@ import RedisModule from './redis/redis.module';
 import RoleModule from './role/role.module';
 import SessionModule from './session/session.module';
 import StorageModule from './storage/storage.module';
+import TaskModule from './task/task.module';
 import UserModule from './user/user.module';
 import WorkspaceModule from './workspace/workspace.module';
 
@@ -49,6 +50,7 @@ import WorkspaceModule from './workspace/workspace.module';
     RoleModule,
     WorkspaceModule,
     ProjectModule,
+    TaskModule,
   ],
   providers: [
     {

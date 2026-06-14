@@ -77,6 +77,11 @@ class ProjectService {
     return Boolean(project);
   }
 
+  async checkExistProjectInWorkspaceWithId(workspaceId: number, id: number) {
+    const project = await this.projectRepo.findOne({ workspace: { id: workspaceId }, id }, { fields: ['id'] });
+    return Boolean(project);
+  }
+
   private buildWhereClause(workspaceId: number, query: GetProjectsQuery) {
     const { search, is_archived, start_date, end_date } = query;
 

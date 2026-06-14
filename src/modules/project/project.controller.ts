@@ -32,7 +32,7 @@ class ProjectController {
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: ProjectMessage.PROJECT_GET,
-    summary: 'Get a list of all projects in the workspace.',
+    summary: 'Get all projects',
     type: GetProjectsResponseDto,
     secure: 'required',
   })
@@ -45,7 +45,7 @@ class ProjectController {
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: ProjectMessage.PROJECT_GET,
-    summary: 'Get details of a specific project by its slug.',
+    summary: 'Get project with slug',
     type: GetProjectResponseDto,
     secure: 'required',
   })
@@ -61,7 +61,7 @@ class ProjectController {
   @ApiStandard({
     status: HttpStatus.CREATED,
     successMessage: ProjectMessage.PROJECT_CREATED,
-    summary: 'Create a new project in the workspace.',
+    summary: 'Create project',
     type: CreateProjectResponseDto,
     secure: 'required',
   })
@@ -74,7 +74,7 @@ class ProjectController {
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: ProjectMessage.PROJECT_UPDATED,
-    summary: 'Update an existing project in the workspace.',
+    summary: 'Update a project',
     type: UpdaterProjectResponseDto,
     secure: 'required',
   })
@@ -91,7 +91,7 @@ class ProjectController {
   @ApiStandard({
     status: HttpStatus.OK,
     successMessage: ProjectMessage.PROJECT_DELETED,
-    summary: 'Delete a project from the workspace.',
+    summary: 'Delete a project',
     type: DeleteProjectResponseDto,
     secure: 'required',
   })
