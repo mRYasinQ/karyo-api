@@ -47,13 +47,19 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-#### 4. Enter application container (Optional)
+#### 4. Enter application container
 
 ```bash
 docker compose exec app sh
 ```
 
-#### 5. Access the application
+#### 5. Create superuser
+
+```bash
+npm run superuser:create
+```
+
+#### 6. Access the application
 
 - **API Base URL:** http://localhost:3000
 - **API Documentation (Swagger):** http://localhost:3000/docs
